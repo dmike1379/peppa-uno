@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="100" fill="#445566"/>
+  <circle cx="100" cy="100" r="96" fill="#6688AA"/>
+  <!-- Floppy dog ears -->
+  <ellipse cx="62" cy="80" rx="18" ry="30" fill="#BBCCDD" transform="rotate(-20 62 80)"/>
+  <ellipse cx="138" cy="80" rx="18" ry="30" fill="#BBCCDD" transform="rotate(20 138 80)"/>
+  <!-- Head -->
+  <ellipse cx="100" cy="100" rx="54" ry="50" fill="#BBCCDD"/>
+  <!-- Snout (dog muzzle) -->
+  <ellipse cx="100" cy="112" rx="24" ry="18" fill="#DDEEFF"/>
+  <!-- Nose -->
+  <ellipse cx="100" cy="107" rx="9" ry="7" fill="#223344"/>
+  <circle cx="97" cy="105" r="2" fill="#445566"/>
+  <!-- Mouth -->
+  <path d="M92,117 Q100,124 108,117" fill="none" stroke="#445566" stroke-width="2"/>
+  <!-- Eyes -->
+  <circle cx="83" cy="90" r="9" fill="white"/>
+  <circle cx="117" cy="90" r="9" fill="white"/>
+  <circle cx="85" cy="90" r="5" fill="#1a1a1a"/>
+  <circle cx="119" cy="90" r="5" fill="#1a1a1a"/>
+  <circle cx="86" cy="88" r="2" fill="white"/>
+  <circle cx="120" cy="88" r="2" fill="white"/>
+  <!-- Name -->
+  <text x="100" y="167" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">DANNY DOG</text>
+  <text x="100" y="185" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-family="Arial, sans-serif" font-size="10">Replace with AI avatar</text>
+</svg>

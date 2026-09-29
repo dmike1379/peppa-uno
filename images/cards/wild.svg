@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="240" viewBox="0 0 160 240">
+  <!-- Black background -->
+  <rect width="160" height="240" rx="18" fill="#111111"/>
+  <!-- 4 color quadrants -->
+  <path d="M18,0 Q0,0 0,18 L0,120 L80,120 L80,0 Z" fill="#E74C3C"/>
+  <path d="M142,0 Q160,0 160,18 L160,120 L80,120 L80,0 Z" fill="#F1C40F"/>
+  <path d="M0,120 L0,222 Q0,240 18,240 L80,240 L80,120 Z" fill="#27AE60"/>
+  <path d="M160,120 L160,222 Q160,240 142,240 L80,240 L80,120 Z" fill="#3498DB"/>
+  <!-- Black center oval -->
+  <ellipse cx="80" cy="120" rx="50" ry="72" fill="#111111"/>
+  <ellipse cx="80" cy="120" rx="44" ry="66" fill="#1a1a1a"/>
+  <!-- WILD text -->
+  <text x="80" y="108" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="26" font-weight="bold" font-style="italic">WILD</text>
+  <!-- Peppa pig snout as the wild symbol -->
+  <ellipse cx="80" cy="132" rx="18" ry="13" fill="#FF6BA8"/>
+  <circle cx="74" cy="132" r="5" fill="#CC3377"/>
+  <circle cx="86" cy="132" r="5" fill="#CC3377"/>
+  <!-- Corner labels -->
+  <text x="14" y="26" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">W</text>
+  <text x="140" y="26" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">W</text>
+  <text x="14" y="228" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold" transform="rotate(180 22 222)">W</text>
+  <text x="148" y="228" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold" transform="rotate(180 148 222)">W</text>
+  <!-- Replace note -->
+  <text x="80" y="192" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-family="Arial, sans-serif" font-size="8">Replace with custom art</text>
+</svg>

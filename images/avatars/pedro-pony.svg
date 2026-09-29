@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="100" fill="#AA8800"/>
+  <circle cx="100" cy="100" r="96" fill="#DDAA22"/>
+  <!-- Mane -->
+  <ellipse cx="100" cy="60" rx="30" ry="20" fill="#CC8800"/>
+  <ellipse cx="75" cy="66" rx="16" ry="22" fill="#CC8800"/>
+  <ellipse cx="125" cy="66" rx="16" ry="22" fill="#CC8800"/>
+  <!-- Ears (pony ears, pointed) -->
+  <polygon points="74,68 64,44 84,56" fill="#EEBB66"/>
+  <polygon points="126,68 116,44 136,56" fill="#EEBB66"/>
+  <polygon points="74,68 67,50 81,58" fill="#FFDDAA"/>
+  <polygon points="126,68 119,50 133,58" fill="#FFDDAA"/>
+  <!-- Head -->
+  <ellipse cx="100" cy="104" rx="54" ry="48" fill="#EEBB66"/>
+  <!-- Long pony snout -->
+  <ellipse cx="100" cy="118" rx="26" ry="20" fill="#FFDDAA"/>
+  <!-- Nostrils -->
+  <circle cx="92" cy="120" r="4" fill="#CC8800"/>
+  <circle cx="108" cy="120" r="4" fill="#CC8800"/>
+  <!-- Eyes -->
+  <circle cx="82" cy="94" r="9" fill="white"/>
+  <circle cx="118" cy="94" r="9" fill="white"/>
+  <circle cx="84" cy="94" r="5" fill="#1a1a1a"/>
+  <circle cx="120" cy="94" r="5" fill="#1a1a1a"/>
+  <circle cx="85" cy="92" r="2" fill="white"/>
+  <circle cx="121" cy="92" r="2" fill="white"/>
+  <!-- Name -->
+  <text x="100" y="168" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">PEDRO PONY</text>
+  <text x="100" y="185" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-family="Arial, sans-serif" font-size="10">Replace with AI avatar</text>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="240" viewBox="0 0 160 240">
+  <!-- Black background -->
+  <rect width="160" height="240" rx="18" fill="#111111"/>
+  <!-- 4 color quadrants -->
+  <path d="M18,0 Q0,0 0,18 L0,120 L80,120 L80,0 Z" fill="#E74C3C"/>
+  <path d="M142,0 Q160,0 160,18 L160,120 L80,120 L80,0 Z" fill="#F1C40F"/>
+  <path d="M0,120 L0,222 Q0,240 18,240 L80,240 L80,120 Z" fill="#27AE60"/>
+  <path d="M160,120 L160,222 Q160,240 142,240 L80,240 L80,120 Z" fill="#3498DB"/>
+  <!-- Stacked mini cards suggesting Draw 4 -->
+  <rect x="48" y="88" width="36" height="52" rx="4" fill="#3498DB" opacity="0.9"/>
+  <rect x="54" y="84" width="36" height="52" rx="4" fill="#27AE60" opacity="0.9"/>
+  <rect x="60" y="80" width="36" height="52" rx="4" fill="#F1C40F" opacity="0.9"/>
+  <rect x="66" y="76" width="36" height="52" rx="4" fill="#E74C3C" opacity="0.9"/>
+  <!-- +4 text on top card -->
+  <text x="84" y="108" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="22" font-weight="bold">+4</text>
+  <!-- Black center band -->
+  <rect x="0" y="148" width="160" height="46" fill="#111111"/>
+  <!-- WILD text -->
+  <text x="80" y="178" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="22" font-weight="bold" font-style="italic">WILD</text>
+  <!-- Corner labels -->
+  <text x="14" y="26" fill="white" font-family="Arial, sans-serif" font-size="11" font-weight="bold">W+4</text>
+  <!-- Replace note -->
+  <text x="80" y="224" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-family="Arial, sans-serif" font-size="8">Replace with custom art</text>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="100" fill="#6633AA"/>
+  <circle cx="100" cy="100" r="96" fill="#8855CC"/>
+  <!-- Fluffy ears -->
+  <circle cx="55" cy="60" r="22" fill="#F0E0FF"/>
+  <circle cx="145" cy="60" r="22" fill="#F0E0FF"/>
+  <circle cx="45" cy="52" r="12" fill="#F0E0FF"/>
+  <circle cx="65" cy="52" r="12" fill="#F0E0FF"/>
+  <circle cx="135" cy="52" r="12" fill="#F0E0FF"/>
+  <circle cx="155" cy="52" r="12" fill="#F0E0FF"/>
+  <!-- Head -->
+  <ellipse cx="100" cy="100" rx="55" ry="52" fill="#F8F0FF"/>
+  <!-- Fluffy top of head -->
+  <circle cx="78" cy="68" r="16" fill="#F0E0FF"/>
+  <circle cx="100" cy="62" r="18" fill="#F0E0FF"/>
+  <circle cx="122" cy="68" r="16" fill="#F0E0FF"/>
+  <!-- Snout (sheep) -->
+  <ellipse cx="100" cy="112" rx="20" ry="14" fill="#DDCCEE"/>
+  <circle cx="93" cy="112" r="4" fill="#AA88CC"/>
+  <circle cx="107" cy="112" r="4" fill="#AA88CC"/>
+  <!-- Eyes -->
+  <circle cx="83" cy="90" r="9" fill="white"/>
+  <circle cx="117" cy="90" r="9" fill="white"/>
+  <circle cx="85" cy="90" r="5" fill="#1a1a1a"/>
+  <circle cx="119" cy="90" r="5" fill="#1a1a1a"/>
+  <circle cx="86" cy="88" r="2" fill="white"/>
+  <circle cx="120" cy="88" r="2" fill="white"/>
+  <!-- Name -->
+  <text x="100" y="167" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">SUZY SHEEP</text>
+  <text x="100" y="185" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-family="Arial, sans-serif" font-size="10">Replace with AI avatar</text>
+</svg>

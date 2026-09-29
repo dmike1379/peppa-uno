@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="100" fill="#CC6600"/>
+  <circle cx="100" cy="100" r="96" fill="#EE8822"/>
+  <!-- Long rabbit ears -->
+  <ellipse cx="78" cy="42" rx="14" ry="34" fill="#FFDDBB"/>
+  <ellipse cx="122" cy="42" rx="14" ry="34" fill="#FFDDBB"/>
+  <ellipse cx="78" cy="42" rx="7" ry="26" fill="#FFAABB"/>
+  <ellipse cx="122" cy="42" rx="7" ry="26" fill="#FFAABB"/>
+  <!-- Head -->
+  <ellipse cx="100" cy="105" rx="54" ry="50" fill="#FFDDBB"/>
+  <!-- Snout (bunny) -->
+  <ellipse cx="100" cy="116" rx="18" ry="13" fill="#FFBBAA"/>
+  <circle cx="100" cy="111" r="4" fill="#FF7799"/>
+  <!-- Mouth -->
+  <path d="M94,117 Q100,123 106,117" fill="none" stroke="#CC6688" stroke-width="2"/>
+  <!-- Eyes -->
+  <circle cx="83" cy="92" r="9" fill="white"/>
+  <circle cx="117" cy="92" r="9" fill="white"/>
+  <circle cx="85" cy="92" r="5" fill="#1a1a1a"/>
+  <circle cx="119" cy="92" r="5" fill="#1a1a1a"/>
+  <circle cx="86" cy="90" r="2" fill="white"/>
+  <circle cx="120" cy="90" r="2" fill="white"/>
+  <!-- Name -->
+  <text x="100" y="170" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="15" font-weight="bold">REBECCA RABBIT</text>
+  <text x="100" y="186" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-family="Arial, sans-serif" font-size="10">Replace with AI avatar</text>
+</svg>

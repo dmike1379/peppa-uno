@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="240" viewBox="0 0 160 240">
+  <!-- Card background -->
+  <rect width="160" height="240" rx="18" fill="#CC2266"/>
+  <!-- Outer border -->
+  <rect x="6" y="6" width="148" height="228" rx="14" fill="none" stroke="white" stroke-width="3"/>
+  <!-- Inner oval (UNO-style) -->
+  <ellipse cx="80" cy="120" rx="52" ry="76" fill="#AA1155"/>
+  <ellipse cx="80" cy="120" rx="46" ry="70" fill="#EE3388"/>
+  <!-- Muddy puddles decorative dots (Peppa reference) -->
+  <circle cx="30" cy="40" r="6" fill="rgba(255,255,255,0.25)"/>
+  <circle cx="42" cy="52" r="4" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="130" cy="195" r="7" fill="rgba(255,255,255,0.25)"/>
+  <circle cx="118" cy="206" r="4" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="138" cy="185" r="5" fill="rgba(255,255,255,0.15)"/>
+  <!-- Game name text -->
+  <text x="80" y="108" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="28" font-weight="bold" font-style="italic">Peppa</text>
+  <text x="80" y="142" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="32" font-weight="bold" font-style="italic">UNO</text>
+  <!-- Small pig snout decoration -->
+  <ellipse cx="80" cy="162" rx="12" ry="8" fill="rgba(255,255,255,0.3)"/>
+  <circle cx="76" cy="162" r="3" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="84" cy="162" r="3" fill="rgba(255,255,255,0.5)"/>
+  <!-- Replace note -->
+  <text x="80" y="230" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="Arial, sans-serif" font-size="8">Replace with custom art</text>
+</svg>

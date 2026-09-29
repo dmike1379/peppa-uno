@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="#E8437A"/>
+  <circle cx="100" cy="100" r="96" fill="#FF6BA8"/>
+  <!-- Ears -->
+  <circle cx="60" cy="62" r="20" fill="#FFB3CE"/>
+  <circle cx="140" cy="62" r="20" fill="#FFB3CE"/>
+  <circle cx="60" cy="62" r="11" fill="#FF8FB0"/>
+  <circle cx="140" cy="62" r="11" fill="#FF8FB0"/>
+  <!-- Head -->
+  <ellipse cx="100" cy="100" rx="56" ry="52" fill="#FFB3CE"/>
+  <!-- Snout -->
+  <ellipse cx="100" cy="114" rx="23" ry="16" fill="#FF8FB0"/>
+  <circle cx="92" cy="114" r="5" fill="#CC4477"/>
+  <circle cx="108" cy="114" r="5" fill="#CC4477"/>
+  <!-- Eyes -->
+  <circle cx="83" cy="90" r="9" fill="white"/>
+  <circle cx="117" cy="90" r="9" fill="white"/>
+  <circle cx="85" cy="90" r="5" fill="#1a1a1a"/>
+  <circle cx="119" cy="90" r="5" fill="#1a1a1a"/>
+  <circle cx="86" cy="88" r="2" fill="white"/>
+  <circle cx="120" cy="88" r="2" fill="white"/>
+  <!-- Bow -->
+  <polygon points="100,68 88,58 88,78" fill="#FF4080"/>
+  <polygon points="100,68 112,58 112,78" fill="#FF4080"/>
+  <circle cx="100" cy="68" r="6" fill="#CC2060"/>
+  <!-- Name -->
+  <text x="100" y="167" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="bold">PEPPA</text>
+  <text x="100" y="185" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-family="Arial, sans-serif" font-size="10">Replace with AI avatar</text>
+</svg>

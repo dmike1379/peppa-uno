@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="100" fill="#1A6BB0"/>
+  <circle cx="100" cy="100" r="96" fill="#3A8FD4"/>
+  <!-- Ears -->
+  <circle cx="60" cy="65" r="18" fill="#FFB3CE"/>
+  <circle cx="140" cy="65" r="18" fill="#FFB3CE"/>
+  <circle cx="60" cy="65" r="10" fill="#FF8FB0"/>
+  <circle cx="140" cy="65" r="10" fill="#FF8FB0"/>
+  <!-- Head (smaller/rounder — he's younger) -->
+  <ellipse cx="100" cy="100" rx="52" ry="50" fill="#FFB3CE"/>
+  <!-- Snout -->
+  <ellipse cx="100" cy="113" rx="20" ry="14" fill="#FF8FB0"/>
+  <circle cx="93" cy="113" r="4" fill="#CC4477"/>
+  <circle cx="107" cy="113" r="4" fill="#CC4477"/>
+  <!-- Eyes -->
+  <circle cx="85" cy="91" r="8" fill="white"/>
+  <circle cx="115" cy="91" r="8" fill="white"/>
+  <circle cx="87" cy="91" r="4" fill="#1a1a1a"/>
+  <circle cx="117" cy="91" r="4" fill="#1a1a1a"/>
+  <circle cx="88" cy="89" r="1.5" fill="white"/>
+  <circle cx="118" cy="89" r="1.5" fill="white"/>
+  <!-- Tiny dinosaur sticker on cheek -->
+  <text x="118" y="108" font-size="16" text-anchor="middle">🦕</text>
+  <!-- Name -->
+  <text x="100" y="167" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="22" font-weight="bold">GEORGE</text>
+  <text x="100" y="185" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-family="Arial, sans-serif" font-size="10">Replace with AI avatar</text>
+</svg>

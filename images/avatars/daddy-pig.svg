@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="#B03030"/>
+  <circle cx="100" cy="100" r="96" fill="#D44444"/>
+  <!-- Ears -->
+  <circle cx="56" cy="64" r="22" fill="#FFBBC4"/>
+  <circle cx="144" cy="64" r="22" fill="#FFBBC4"/>
+  <circle cx="56" cy="64" r="13" fill="#FF9999"/>
+  <circle cx="144" cy="64" r="13" fill="#FF9999"/>
+  <!-- Head (bigger/rounder for Daddy Pig) -->
+  <ellipse cx="100" cy="100" rx="60" ry="56" fill="#FFBBC4"/>
+  <!-- Tummy belly area (Daddy Pig's big belly) -->
+  <ellipse cx="100" cy="120" rx="40" ry="22" fill="#FFCCD5"/>
+  <!-- Snout (bigger) -->
+  <ellipse cx="100" cy="116" rx="26" ry="18" fill="#FF9999"/>
+  <circle cx="91" cy="116" r="6" fill="#BB3333"/>
+  <circle cx="109" cy="116" r="6" fill="#BB3333"/>
+  <!-- Glasses -->
+  <circle cx="82" cy="90" r="13" fill="none" stroke="#555" stroke-width="3"/>
+  <circle cx="118" cy="90" r="13" fill="none" stroke="#555" stroke-width="3"/>
+  <line x1="95" y1="90" x2="105" y2="90" stroke="#555" stroke-width="3"/>
+  <line x1="69" y1="90" x2="62" y2="88" stroke="#555" stroke-width="3"/>
+  <line x1="131" y1="90" x2="138" y2="88" stroke="#555" stroke-width="3"/>
+  <!-- Eyes (behind glasses) -->
+  <circle cx="82" cy="90" r="6" fill="#1a1a1a"/>
+  <circle cx="118" cy="90" r="6" fill="#1a1a1a"/>
+  <circle cx="83" cy="88" r="2" fill="white"/>
+  <circle cx="119" cy="88" r="2" fill="white"/>
+  <!-- Name -->
+  <text x="100" y="167" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="19" font-weight="bold">DADDY PIG</text>
+  <text x="100" y="185" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-family="Arial, sans-serif" font-size="10">Replace with AI avatar</text>
+</svg>

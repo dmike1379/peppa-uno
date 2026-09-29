@@ -1,15 +1,9 @@
-// ================================================================
-// FIREBASE CONFIG
-// Replace all values below with your Firebase project config.
-// Get them from: console.firebase.google.com
-//   → Your project → ⚙️ Project Settings → scroll to "Your apps" → </>
-// ================================================================
 const firebaseConfig = {
-  apiKey:            "PASTE_YOUR_API_KEY",
-  authDomain:        "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL:       "https://PASTE_YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId:         "PASTE_YOUR_PROJECT_ID",
-  storageBucket:     "PASTE_YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "PASTE_YOUR_SENDER_ID",
-  appId:             "PASTE_YOUR_APP_ID"
+  apiKey:            "AIzaSyC2oZg9ZSqwzEOW6oO5Gwz649Btd3Rpvu0",
+  authDomain:        "peppauno.firebaseapp.com",
+  databaseURL:       "https://peppauno-default-rtdb.firebaseio.com",
+  projectId:         "peppauno",
+  storageBucket:     "peppauno.firebasestorage.app",
+  messagingSenderId: "163470023859",
+  appId:             "1:163470023859:web:bd2fcbf954f34b7126a4c6"
 };

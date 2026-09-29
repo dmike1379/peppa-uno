@@ -1,0 +1,13 @@
+{
+  "name": "Peppa UNO",
+  "short_name": "Peppa UNO",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#BDE9FF",
+  "theme_color": "#5EC4F5",
+  "icons": [
+    { "src": "images/avatars/peppa.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any" }
+  ]
+}

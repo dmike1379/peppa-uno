@@ -2,18 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#5EC4F5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="images/avatars/peppa.jpg">
+  <link rel="manifest" href="manifest.json">
   <title>Peppa UNO 🐷</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="game-page">
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
 
   <!-- Opponent (top) -->
   <div class="opponent-area">
-    <div class="player-info">
+    <div class="player-info" id="oppInfo">
       <img class="player-avatar" id="oppAvatar" src="images/avatars/peppa.svg" alt="">
       <span class="player-name" id="oppName">Waiting…</span>
-      <span class="card-count" id="oppCount">🃏 0</span>
+      <span class="card-count" id="oppCount">0 cards</span>
     </div>
     <div class="opp-hand" id="oppHand"></div>
   </div>
@@ -22,23 +32,29 @@
   <div class="table-area">
     <div class="pile-row">
       <div class="pile-wrap">
-        <div class="card card-back pile-card" id="drawPile"><span class="pile-word">DRAW</span></div>
-        <span class="pile-label">Draw</span>
+        <div class="card card-back" id="drawPile">
+          <span class="back-pig">🐷</span>
+          <span class="pile-word">DRAW</span>
+        </div>
+        <span class="pile-label">Tap to draw</span>
       </div>
-      <div class="pile-wrap">
-        <div class="card pile-card" id="topCard"></div>
-        <span class="pile-label">Discard</span>
+      <div class="pile-wrap puddle">
+        <div class="card" id="topCard"></div>
+        <span class="pile-label">Muddy puddle</span>
       </div>
     </div>
-    <div class="status-bar" id="statusBar">Loading…</div>
+    <div class="status-bar" id="statusBar">
+      <div class="status-main" id="statusMain">Loading…</div>
+      <div class="status-sub" id="statusSub"></div>
+    </div>
   </div>
 
-  <!-- My area (bottom) -->
+  <!-- My area (bottom, on the hill) -->
   <div class="my-area" id="myArea">
-    <div class="player-info">
+    <div class="player-info" id="myInfo">
       <img class="player-avatar" id="myAvatar" src="images/avatars/daddy-pig.svg" alt="">
       <span class="player-name" id="myName">You</span>
-      <span class="card-count" id="myCount">🃏 0</span>
+      <span class="card-count" id="myCount">0 cards</span>
     </div>
     <div class="my-hand" id="myHand"></div>
   </div>
@@ -46,12 +62,12 @@
   <!-- Color picker overlay -->
   <div class="overlay hidden" id="colorOverlay">
     <div class="overlay-box">
-      <h3>Choose a color</h3>
+      <h3>Pick a color!</h3>
       <div class="color-grid">
-        <button class="color-btn color-red"   data-color="red"   >❤️ Red</button>
-        <button class="color-btn color-yellow" data-color="yellow">💛 Yellow</button>
-        <button class="color-btn color-green"  data-color="green" >💚 Green</button>
-        <button class="color-btn color-blue"   data-color="blue"  >💙 Blue</button>
+        <button class="color-btn color-red"    data-color="red">Red</button>
+        <button class="color-btn color-yellow" data-color="yellow">Yellow</button>
+        <button class="color-btn color-green"  data-color="green">Green</button>
+        <button class="color-btn color-blue"   data-color="blue">Blue</button>
       </div>
     </div>
   </div>
@@ -59,11 +75,10 @@
   <!-- Win overlay -->
   <div class="overlay hidden" id="winOverlay">
     <div class="overlay-box win-box">
-      <div class="win-emoji">🎉</div>
+      <img class="win-avatar" id="winAvatar" src="" alt="">
       <h2 id="winMsg">You Win!</h2>
-      <p id="winSub">🐷 Oink oink!</p>
-      <button class="btn btn-primary" id="playAgainBtn">Play Again</button>
-      <a class="btn btn-outline" href="index.html">Home</a>
+      <p id="winSub">Oink oink! 🐷</p>
+      <button class="btn btn-primary" id="playAgainBtn">🐷 Play again</button>
     </div>
   </div>
 

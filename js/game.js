@@ -11,14 +11,25 @@ if (!roomCode) { window.location.href = 'index.html'; }
 const gameRef   = db.ref(`games/${roomCode}`);
 let   gameState = null;
 let   pendingWild = null;
+let   busy        = false;   // blocks double-taps while a move is saving
+let   lastTopId   = null;
+let   winShown    = false;
 
 // ─ Helpers ────────────────────────────────────────────────────
+
+// Firebase deletes empty lists and can turn lists into objects.
+// This always hands back a real list so the game never crashes on an empty pile.
+function arr(x) {
+  if (Array.isArray(x)) return x.filter(Boolean);
+  if (x && typeof x === 'object') return Object.values(x).filter(Boolean);
+  return [];
+}
 
 function sym(card) {
   switch (card.type) {
     case 'number':         return String(card.value);
     case 'skip':           return '⊘';
-    case 'reverse':        return '↺';
+    case 'reverse':        return '⇄';
     case 'draw_two':       return '+2';
     case 'wild':           return '★';
     case 'wild_draw_four': return '+4';
@@ -28,10 +39,14 @@ function sym(card) {
 
 function label(card) {
   const s = sym(card);
-  return card.color === 'wild' ? `Wild ${s}` : `${card.color} ${s}`;
+  const names = { skip: 'Skip', reverse: 'Reverse', draw_two: 'Draw 2', wild: 'Wild', wild_draw_four: 'Wild +4' };
+  if (card.color === 'wild') return names[card.type];
+  const what = card.type === 'number' ? s : names[card.type];
+  return `${card.color} ${what}`;
 }
 
 function canPlay(card, top, color) {
+  if (!top) return true;
   if (card.type === 'wild' || card.type === 'wild_draw_four') return true;
   if (card.color === color)  return true;
   if (card.type === 'number' && top.type === 'number' && card.value === top.value) return true;
@@ -47,18 +62,31 @@ function refill(drawPile, discardPile) {
   return { drawPile: rest, discardPile: [top] };
 }
 
-// ─ Card DOM ───────────────────────────────────────────────
+function countText(n) {
+  if (n === 1) return 'UNO!';
+  return `${n} cards`;
+}
+
+// ─ Card DOM ───────────────────────────────────────────────────
+
+function cardInner(card) {
+  const s = sym(card);
+  return `
+    <span class="card-oval"></span>
+    <span class="card-value">${s}</span>
+    <span class="card-corner tl">${s}</span>
+    <span class="card-corner br">${s}</span>
+  `;
+}
 
 function buildCard(card, { clickable = false, dimmed = false } = {}) {
   const el = document.createElement('div');
-  const s  = sym(card);
   el.className = `card card-${card.color}${dimmed ? ' dimmed' : ''}`;
-  el.innerHTML = `
-    <span class="card-corner tl">${s}</span>
-    <span class="card-value">${s}</span>
-    <span class="card-corner br">${s}</span>
-  `;
-  if (clickable) el.addEventListener('click', () => onCardClick(card));
+  el.innerHTML = cardInner(card);
+  if (clickable) {
+    el.setAttribute('role', 'button');
+    el.addEventListener('click', () => onCardClick(card));
+  }
   return el;
 }
 
@@ -68,106 +96,133 @@ function buildFaceDown() {
   return el;
 }
 
-function avatarSrc(avatar) {
-  // Prefer PNG (AI art) with SVG fallback
-  return `images/avatars/${avatar}.png`;
-}
-
 function setAvatar(imgEl, avatar) {
+  if (imgEl.dataset.avatar === avatar) return;   // don't reload the image every update
+  imgEl.dataset.avatar = avatar;
   imgEl.src = `images/avatars/${avatar}.jpg`;
   imgEl.onerror = () => {
+    imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = `images/avatars/${avatar}.svg`; };
     imgEl.src = `images/avatars/${avatar}.png`;
-    imgEl.onerror = () => { imgEl.src = `images/avatars/${avatar}.svg`; imgEl.onerror = null; };
   };
 }
 
-// ─ Render ────────────────────────────────────────────────
+// Size my cards so the whole hand fits on screen in at most 3 rows — no sideways scrolling
+function sizeHand(n) {
+  const handEl = document.getElementById('myHand');
+  const availW = Math.min(handEl.clientWidth || window.innerWidth - 20, 560);
+  const gap    = 6;
+  const rows   = n <= 5 ? 1 : n <= 12 ? 2 : 3;
+  const perRow = Math.max(1, Math.ceil(n / rows));
+  const w      = Math.floor((availW - (perRow - 1) * gap) / perRow);
+  handEl.style.setProperty('--card-w', `${Math.max(40, Math.min(w, 84))}px`);
+}
+
+// ─ Render ─────────────────────────────────────────────────────
 
 function renderGame(state) {
   gameState = state;
   if (!state || !state.players || !state.players[mySlot]) return;
 
-  const isMyTurn = state.currentPlayer === mySlot && state.state === 'playing';
+  const playing  = state.state === 'playing';
+  const isMyTurn = state.currentPlayer === mySlot && playing;
   const me       = state.players[mySlot];
   const opp      = state.players[oppSlot];
-  const myHand   = (state.hands && state.hands[mySlot])  || [];
-  const oppHand  = (state.hands && state.hands[oppSlot]) || [];
-  const discard  = state.discardPile || [];
+  const hands    = state.hands || {};
+  const myHand   = arr(hands[mySlot]);
+  const oppHand  = arr(hands[oppSlot]);
+  const discard  = arr(state.discardPile);
   const top      = discard[discard.length - 1];
   const color    = state.currentColor;
 
-  // Player info
-  document.getElementById('myName').textContent  = me.name;
+  // Player strips
+  document.getElementById('myName').textContent = me.name;
   setAvatar(document.getElementById('myAvatar'), me.avatar);
-  document.getElementById('myCount').textContent =
-    `🃏 ${myHand.length}${myHand.length === 1 ? ' · UNO!' : ''}`;
+  const myCount = document.getElementById('myCount');
+  myCount.textContent = countText(myHand.length);
+  myCount.classList.toggle('uno', myHand.length === 1);
+  document.getElementById('myInfo').classList.toggle('active', isMyTurn);
 
   if (opp) {
-    document.getElementById('oppName').textContent  = opp.name;
+    document.getElementById('oppName').textContent = opp.name;
     setAvatar(document.getElementById('oppAvatar'), opp.avatar);
-    document.getElementById('oppCount').textContent =
-      `🃏 ${oppHand.length}${oppHand.length === 1 ? ' · UNO!' : ''}`;
+    const oppCount = document.getElementById('oppCount');
+    oppCount.textContent = countText(oppHand.length);
+    oppCount.classList.toggle('uno', oppHand.length === 1);
   }
+  document.getElementById('oppInfo').classList.toggle('active', playing && !isMyTurn);
 
-  // Opponent face-down cards
+  // Opponent face-down fan
   const oppHandEl = document.getElementById('oppHand');
   oppHandEl.innerHTML = '';
   oppHand.forEach(() => oppHandEl.appendChild(buildFaceDown()));
 
-  // Top discard card
+  // Top of the muddy puddle
   const topEl = document.getElementById('topCard');
   if (top) {
-    const displayColor = (top.color === 'wild' && color) ? color : top.color;
-    const s = sym(top);
-    topEl.className = `card pile-card card-${displayColor}`;
-    topEl.innerHTML = `
-      <span class="card-corner tl">${s}</span>
-      <span class="card-value">${s}</span>
-      <span class="card-corner br">${s}</span>
-    `;
+    const chosen = top.color === 'wild' && color ? ` chosen-${color}` : '';
+    topEl.className = `card card-${top.color}${chosen}`;
+    topEl.innerHTML = cardInner(top);
+    if (lastTopId !== null && lastTopId !== top.id) {
+      topEl.classList.add('just-played');
+    }
+    lastTopId = top.id;
   }
 
   // My hand
+  sizeHand(myHand.length);
   const myHandEl = document.getElementById('myHand');
   myHandEl.innerHTML = '';
-  document.getElementById('myArea').className = `my-area ${isMyTurn ? 'my-turn' : 'not-my-turn'}`;
-
+  let anyPlayable = false;
   myHand.forEach(card => {
     const playable = isMyTurn && canPlay(card, top, color);
+    if (playable) anyPlayable = true;
     const el = buildCard(card, { clickable: playable, dimmed: isMyTurn && !playable });
     if (playable) el.classList.add('playable');
     myHandEl.appendChild(el);
   });
 
-  // Status bar
-  const bar = document.getElementById('statusBar');
+  // Turn banner — always says whose turn it is; the last move goes underneath
+  const bar  = document.getElementById('statusBar');
+  const main = document.getElementById('statusMain');
+  const sub  = document.getElementById('statusSub');
+  bar.classList.toggle('my-turn', isMyTurn);
   if (state.state === 'waiting') {
-    bar.textContent = 'Waiting for the other player…';
-  } else if (state.lastAction) {
-    bar.textContent = state.lastAction;
+    main.textContent = 'Waiting for the other player…';
+    sub.textContent  = '';
+  } else if (state.state === 'finished') {
+    main.textContent = 'Game over!';
+    sub.textContent  = state.lastAction || '';
+  } else if (isMyTurn) {
+    main.textContent = `Your turn, ${me.name}! 🐷`;
+    sub.textContent  = anyPlayable
+      ? 'Tap a shiny card to play it'
+      : 'No match — tap the Draw pile!';
   } else {
-    bar.textContent = isMyTurn ? 'Your turn! 🐷' : `${opp ? opp.name + "'s" : "Other player's"} turn…`;
+    main.textContent = `${opp ? opp.name : 'Other player'}'s turn…`;
+    sub.textContent  = state.lastAction || '';
+  }
+  if (isMyTurn && state.lastAction && anyPlayable) {
+    sub.textContent = state.lastAction;
   }
 
-  // Draw pile tap
+  // Draw pile
   const drawEl = document.getElementById('drawPile');
-  if (isMyTurn) {
-    drawEl.classList.add('clickable-pile');
-    drawEl.onclick = onDrawClick;
-  } else {
-    drawEl.classList.remove('clickable-pile');
-    drawEl.onclick = null;
-  }
+  drawEl.classList.toggle('clickable-pile', isMyTurn);
+  drawEl.classList.toggle('pulse', isMyTurn && !anyPlayable);
+  drawEl.onclick = isMyTurn ? onDrawClick : null;
 
   // Win check
-  if (state.winner) showWin(state.winner, state.players);
+  if (state.winner && !winShown) showWin(state.winner, state.players);
 }
 
-// ─ Play card ─────────────────────────────────────────────
+window.addEventListener('resize', () => { if (gameState) renderGame(gameState); });
+
+// ─ Play card ──────────────────────────────────────────────────
 
 function onCardClick(card) {
-  if (!gameState || gameState.currentPlayer !== mySlot || gameState.state !== 'playing') return;
-  const top   = gameState.discardPile[gameState.discardPile.length - 1];
+  if (busy || !gameState || gameState.currentPlayer !== mySlot || gameState.state !== 'playing') return;
+  const discard = arr(gameState.discardPile);
+  const top     = discard[discard.length - 1];
   if (!canPlay(card, top, gameState.currentColor)) return;
 
   if (card.type === 'wild' || card.type === 'wild_draw_four') {
@@ -179,110 +234,135 @@ function onCardClick(card) {
 }
 
 async function doPlay(card, chosenColor) {
-  const s       = gameState;
-  const myHand  = s.hands[mySlot].filter(c => c.id !== card.id);
-  let drawPile  = [...s.drawPile];
-  let discard   = [...s.discardPile, card];
-  const newColor = card.color === 'wild' ? chosenColor : card.color;
+  busy = true;
+  try {
+    const s        = gameState;
+    const hands    = s.hands || {};
+    const myHand   = arr(hands[mySlot]).filter(c => c.id !== card.id);
+    let drawPile   = arr(s.drawPile);
+    let discard    = [...arr(s.discardPile), card];
+    const newColor = card.color === 'wild' ? chosenColor : card.color;
+    const myName   = s.players[mySlot].name;
+    const oppName  = s.players[oppSlot].name;
 
-  let nextPlayer = oppSlot;
-  let action     = `${s.players[mySlot].name} played ${label(card)}`;
-  const upd      = {};
+    let nextPlayer = oppSlot;
+    let action     = `${myName} played ${label(card)}`;
+    const upd      = {};
 
-  // Skip / Reverse (2-player reverse = skip)
-  if (card.type === 'skip' || card.type === 'reverse') {
-    nextPlayer = mySlot;
-    action    += ' — skip! Go again 🐷';
-  }
-
-  // Draw Two: auto-give opponent 2 cards, skip their turn
-  if (card.type === 'draw_two') {
-    const oppHand = [...s.hands[oppSlot]];
-    for (let i = 0; i < 2; i++) {
-      const r = refill(drawPile, discard);
-      drawPile = r.drawPile; discard = r.discardPile;
-      if (drawPile.length) oppHand.push(drawPile.shift());
+    // Skip / Reverse (2-player reverse = skip)
+    if (card.type === 'skip' || card.type === 'reverse') {
+      nextPlayer = mySlot;
+      action    += ` — ${myName} goes again!`;
     }
-    upd[`hands/${oppSlot}`] = oppHand;
-    nextPlayer = mySlot;
-    action    += ` — ${s.players[oppSlot].name} draws 2 & skips!`;
-  }
 
-  // Wild Draw Four: auto-give opponent 4 cards, skip their turn
-  if (card.type === 'wild_draw_four') {
-    const oppHand = [...s.hands[oppSlot]];
-    for (let i = 0; i < 4; i++) {
-      const r = refill(drawPile, discard);
-      drawPile = r.drawPile; discard = r.discardPile;
-      if (drawPile.length) oppHand.push(drawPile.shift());
+    // Draw Two / Wild Draw Four: give opponent cards and skip their turn
+    const give = card.type === 'draw_two' ? 2 : card.type === 'wild_draw_four' ? 4 : 0;
+    if (give) {
+      const oppHand = arr(hands[oppSlot]);
+      for (let i = 0; i < give; i++) {
+        const r = refill(drawPile, discard);
+        drawPile = r.drawPile; discard = r.discardPile;
+        if (drawPile.length) oppHand.push(drawPile.shift());
+      }
+      upd[`hands/${oppSlot}`] = oppHand;
+      nextPlayer = mySlot;
+      action    += ` — ${oppName} draws ${give}!`;
     }
-    upd[`hands/${oppSlot}`] = oppHand;
-    nextPlayer = mySlot;
-    action    += ` — ${s.players[oppSlot].name} draws 4 & skips!`;
+
+    if (card.color === 'wild') action += ` Color is ${newColor}.`;
+
+    upd[`hands/${mySlot}`] = myHand;
+    upd.discardPile        = discard;
+    upd.drawPile           = drawPile;
+    upd.currentColor       = newColor;
+    upd.lastAction         = action;
+
+    if (myHand.length === 0) {
+      upd.winner        = mySlot;
+      upd.state         = 'finished';
+      upd.currentPlayer = mySlot;
+    } else {
+      upd.currentPlayer = nextPlayer;
+    }
+
+    await gameRef.update(upd);
+  } finally {
+    busy = false;
   }
-
-  upd[`hands/${mySlot}`] = myHand;
-  upd.discardPile        = discard;
-  upd.drawPile           = drawPile;
-  upd.currentColor       = newColor;
-  upd.lastAction         = action;
-
-  if (myHand.length === 0) {
-    upd.winner = mySlot;
-    upd.state  = 'finished';
-    upd.currentPlayer = mySlot;
-  } else {
-    upd.currentPlayer = nextPlayer;
-  }
-
-  await gameRef.update(upd);
 }
 
 async function onDrawClick() {
   const s = gameState;
-  if (!s || s.currentPlayer !== mySlot || s.state !== 'playing') return;
+  if (busy || !s || s.currentPlayer !== mySlot || s.state !== 'playing') return;
+  busy = true;
+  try {
+    const r = refill(arr(s.drawPile), arr(s.discardPile));
+    const drawPile = r.drawPile;
+    const discard  = r.discardPile;
+    const myHand   = arr((s.hands || {})[mySlot]);
+    const myName   = s.players[mySlot].name;
 
-  const r = refill([...s.drawPile], [...s.discardPile]);
-  let drawPile = r.drawPile;
-  let discard  = r.discardPile;
-  if (!drawPile.length) return;
+    // No cards left anywhere: just pass the turn so the game can't get stuck
+    if (!drawPile.length) {
+      await gameRef.update({ currentPlayer: oppSlot, lastAction: `${myName} passed — no cards left to draw` });
+      return;
+    }
 
-  const myHand = [...s.hands[mySlot]];
-  myHand.push(drawPile.shift());
-
-  await gameRef.update({
-    [`hands/${mySlot}`]: myHand,
-    drawPile,
-    discardPile:   discard,
-    currentPlayer: oppSlot,
-    lastAction:    `${s.players[mySlot].name} drew a card`
-  });
+    myHand.push(drawPile.shift());
+    await gameRef.update({
+      [`hands/${mySlot}`]: myHand,
+      drawPile,
+      discardPile:   discard,
+      currentPlayer: oppSlot,
+      lastAction:    `${myName} drew a card`
+    });
+  } finally {
+    busy = false;
+  }
 }
 
-// ─ Color picker ─────────────────────────────────────────
+// ─ Color picker ───────────────────────────────────────────────
 
 document.querySelectorAll('.color-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.getElementById('colorOverlay').classList.add('hidden');
-    if (pendingWild) { doPlay(pendingWild, btn.dataset.color); pendingWild = null; }
+    if (pendingWild) { const c = pendingWild; pendingWild = null; doPlay(c, btn.dataset.color); }
   });
 });
 
-// ─ Win screen ──────────────────────────────────────────
+// ─ Win screen ─────────────────────────────────────────────────
+
+function confetti() {
+  const colors = ['#F2464B', '#FFC928', '#3FB950', '#3B8BEB', '#FF7EB6'];
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = `${Math.random() * 100}vw`;
+    c.style.background = colors[i % colors.length];
+    c.style.animationDuration = `${2 + Math.random() * 2.5}s`;
+    c.style.animationDelay = `${Math.random() * .8}s`;
+    c.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5500);
+  }
+}
 
 function showWin(winSlot, players) {
-  const isMe = winSlot === mySlot;
-  const name = players[winSlot] ? players[winSlot].name : 'Other player';
-  document.getElementById('winMsg').textContent  = isMe ? '🎉 You Win!' : `${name} Wins!`;
-  document.getElementById('winSub').textContent  = isMe ? 'Oink oink! 🐷' : 'Better luck next time 🐷';
+  winShown = true;
+  const isMe   = winSlot === mySlot;
+  const winner = players[winSlot] || { name: 'Other player', avatar: 'peppa' };
+  setAvatar(document.getElementById('winAvatar'), winner.avatar);
+  document.getElementById('winMsg').textContent = isMe ? 'You win! 🎉' : `${winner.name} wins!`;
+  document.getElementById('winSub').textContent = isMe ? 'Oink oink! Hooray! 🐷' : 'Great game! Play again? 🐷';
   document.getElementById('winOverlay').classList.remove('hidden');
+  confetti();
 }
 
 document.getElementById('playAgainBtn').addEventListener('click', () => {
   window.location.href = 'index.html';
 });
 
-// ─ Firebase listener ────────────────────────────────────
+// ─ Firebase listener ──────────────────────────────────────────
 
 gameRef.on('value', snap => {
   if (!snap.exists()) { window.location.href = 'index.html'; return; }

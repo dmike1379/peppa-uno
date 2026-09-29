@@ -12,27 +12,40 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let selectedAvatar = null;
+let waitingRef     = null;
+let currentCode    = null;
 
-// Build avatar picker
+// Remember name + character on this device (so Linnea doesn't retype every game)
+function remember(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+function recall(key)        { try { return localStorage.getItem(key); } catch (e) { return null; } }
+
+// ─ Avatar picker ──────────────────────────────────────────────
 const grid = document.getElementById('avatarGrid');
 CHARACTERS.forEach(ch => {
-  const el = document.createElement('div');
+  const el = document.createElement('button');
+  el.type = 'button';
   el.className = 'avatar-opt';
   el.dataset.id = ch.id;
-  // Try PNG first (AI art), fall back to SVG placeholder
-  el.innerHTML = `
-    <img src="images/avatars/${ch.id}.jpg"
-         onerror="this.onerror=null;this.src='images/avatars/${ch.id}.png';this.onerror=function(){this.src='images/avatars/${ch.id}.svg';this.onerror=null;}" alt="${ch.name}">
-    <span>${ch.name}</span>
-  `;
-  el.addEventListener('click', () => {
-    document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('sel'));
-    el.classList.add('sel');
-    selectedAvatar = ch.id;
-    checkReady();
-  });
+  const img = document.createElement('img');
+  img.alt = ch.name;
+  // Try JPG (custom art), then PNG, then SVG placeholder
+  img.src = `images/avatars/${ch.id}.jpg`;
+  img.onerror = () => {
+    img.onerror = () => { img.onerror = null; img.src = `images/avatars/${ch.id}.svg`; };
+    img.src = `images/avatars/${ch.id}.png`;
+  };
+  const span = document.createElement('span');
+  span.textContent = ch.name;
+  el.append(img, span);
+  el.addEventListener('click', () => selectAvatar(ch.id));
   grid.appendChild(el);
 });
+
+function selectAvatar(id) {
+  document.querySelectorAll('.avatar-opt').forEach(a => a.classList.toggle('sel', a.dataset.id === id));
+  selectedAvatar = id;
+  checkReady();
+}
 
 const nameInput = document.getElementById('playerName');
 const roomInput = document.getElementById('roomInput');
@@ -41,7 +54,7 @@ const joinBtn   = document.getElementById('joinBtn');
 
 nameInput.addEventListener('input', checkReady);
 roomInput.addEventListener('input', () => {
-  roomInput.value = roomInput.value.toUpperCase();
+  roomInput.value = roomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
   checkReady();
 });
 
@@ -51,13 +64,27 @@ function checkReady() {
   joinBtn.disabled   = !(ok && roomInput.value.trim().length === 4);
 }
 
+// Prefill from last time, and from an invite link (?join=ABCD)
+const savedName   = recall('pu_name');
+const savedAvatar = recall('pu_avatar');
+if (savedName) nameInput.value = savedName;
+if (savedAvatar && CHARACTERS.some(c => c.id === savedAvatar)) selectAvatar(savedAvatar);
+const inviteCode = new URLSearchParams(location.search).get('join');
+if (inviteCode) roomInput.value = inviteCode.toUpperCase().slice(0, 4);
+checkReady();
+
 function genCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
+// ─ Create ─────────────────────────────────────────────────────
 createBtn.addEventListener('click', async () => {
   const name = nameInput.value.trim();
+  remember('pu_name', name);
+  remember('pu_avatar', selectedAvatar);
+  createBtn.disabled = true;
+
   const code = genCode();
   const deck = createDeck();
 
@@ -78,21 +105,24 @@ createBtn.addEventListener('click', async () => {
     currentColor:  startCard.color,
     currentPlayer: 'p1',
     winner:        null,
-    lastAction:    `${name} created the game 🐷`
+    lastAction:    `${name} started the game 🐷`,
+    createdAt:     Date.now()
   };
 
   await db.ref(`games/${code}`).set(state);
   sessionStorage.setItem('playerSlot', 'p1');
   sessionStorage.setItem('roomCode',   code);
+  currentCode = code;
 
   document.getElementById('setupPanel').classList.add('hidden');
-  const wp = document.getElementById('waitingPanel');
-  wp.classList.remove('hidden');
+  document.getElementById('waitingPanel').classList.remove('hidden');
   document.getElementById('displayCode').textContent = code;
 
   // Wait for p2 to join, then start
-  db.ref(`games/${code}/players/p2`).on('value', snap => {
+  waitingRef = db.ref(`games/${code}/players/p2`);
+  waitingRef.on('value', snap => {
     if (snap.exists()) {
+      waitingRef.off();
       db.ref(`games/${code}/state`).set('playing').then(() => {
         window.location.href = `game.html?room=${code}`;
       });
@@ -100,13 +130,44 @@ createBtn.addEventListener('click', async () => {
   });
 });
 
+// ─ Share invite ───────────────────────────────────────────────
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  const url  = `${location.origin}${location.pathname}?join=${currentCode}`;
+  const text = `Come play Peppa UNO with me! 🐷 Code: ${currentCode}`;
+  const btn  = document.getElementById('shareBtn');
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Peppa UNO', text, url }); } catch (e) { /* user cancelled */ }
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(`${text}\n${url}`);
+    btn.textContent = '✅ Invite copied!';
+    setTimeout(() => { btn.textContent = '📲 Send invite'; }, 2000);
+  } catch (e) {
+    btn.textContent = `Code: ${currentCode}`;
+  }
+});
+
+// ─ Cancel waiting ─────────────────────────────────────────────
+document.getElementById('cancelBtn').addEventListener('click', async () => {
+  if (waitingRef) waitingRef.off();
+  if (currentCode) { try { await db.ref(`games/${currentCode}`).remove(); } catch (e) {} }
+  currentCode = null;
+  document.getElementById('waitingPanel').classList.add('hidden');
+  document.getElementById('setupPanel').classList.remove('hidden');
+  checkReady();
+});
+
+// ─ Join ───────────────────────────────────────────────────────
 joinBtn.addEventListener('click', async () => {
   const name = nameInput.value.trim();
   const code = roomInput.value.trim().toUpperCase();
+  remember('pu_name', name);
+  remember('pu_avatar', selectedAvatar);
 
   const snap = await db.ref(`games/${code}`).get();
   if (!snap.exists()) {
-    alert('Room not found — check the code and try again.');
+    alert('Oops! No game with that code. Check it and try again. 🐷');
     return;
   }
   const game = snap.val();

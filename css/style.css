@@ -37,7 +37,7 @@ body {
 .lobby-container { width: 100%; max-width: 420px; }
 
 .game-header { text-align: center; margin-bottom: 24px; }
-.pig-icon    { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; object-position: top center; display: block; flex-shrink: 0; }
+.pig-icon    { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; object-position: top center; display: block; flex-shrink: 0; background: #ffd6e8; }
 .game-title  { font-size: 36px; color: var(--pink-dark); letter-spacing: -1px; }
 .uno-badge   {
   background: var(--pink-dark); color: var(--white);
@@ -93,7 +93,7 @@ input[type="text"]:focus { border-color: var(--pink); }
 }
 .avatar-opt:hover  { border-color: var(--pink-light); }
 .avatar-opt.sel    { border-color: var(--pink-dark); background: var(--pink-light); }
-.avatar-opt img    { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
+.avatar-opt img    { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; object-position: top center; background: #ffd6e8; }
 .avatar-opt span   { font-size: 10px; font-weight: bold; text-align: center; }
 
 .lobby-buttons { display: flex; flex-direction: column; gap: 12px; }
@@ -202,6 +202,8 @@ input[type="text"]:focus { border-color: var(--pink); }
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,.8);
   object-fit: cover;
+  object-position: top center;
+  background: #ffd6e8;
 }
 .player-name {
   font-size: 14px; font-weight: bold;

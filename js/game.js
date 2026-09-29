@@ -74,8 +74,11 @@ function avatarSrc(avatar) {
 }
 
 function setAvatar(imgEl, avatar) {
-  imgEl.src = avatarSrc(avatar);
-  imgEl.onerror = () => { imgEl.src = `images/avatars/${avatar}.svg`; imgEl.onerror = null; };
+  imgEl.src = `images/avatars/${avatar}.jpg`;
+  imgEl.onerror = () => {
+    imgEl.src = `images/avatars/${avatar}.png`;
+    imgEl.onerror = () => { imgEl.src = `images/avatars/${avatar}.svg`; imgEl.onerror = null; };
+  };
 }
 
 // ─ Render ────────────────────────────────────────────────

@@ -21,8 +21,8 @@ CHARACTERS.forEach(ch => {
   el.dataset.id = ch.id;
   // Try PNG first (AI art), fall back to SVG placeholder
   el.innerHTML = `
-    <img src="images/avatars/${ch.id}.png"
-         onerror="this.src='images/avatars/${ch.id}.svg'" alt="${ch.name}">
+    <img src="images/avatars/${ch.id}.jpg"
+         onerror="this.onerror=null;this.src='images/avatars/${ch.id}.png';this.onerror=function(){this.src='images/avatars/${ch.id}.svg';this.onerror=null;}" alt="${ch.name}">
     <span>${ch.name}</span>
   `;
   el.addEventListener('click', () => {

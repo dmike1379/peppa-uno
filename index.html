@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Peppa UNO 🐷</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="lobby-page">
+  <div class="lobby-container">
+    <header class="game-header">
+      <div class="pig-icon">🐷</div>
+      <h1 class="game-title">Peppa <span class="uno-badge">UNO</span></h1>
+    </header>
+
+    <div class="lobby-card" id="setupPanel">
+      <div class="form-group">
+        <label for="playerName">Your Name</label>
+        <input type="text" id="playerName" placeholder="Mike or Linnea" maxlength="12" autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label>Pick Your Character</label>
+        <div class="avatar-grid" id="avatarGrid"></div>
+      </div>
+
+      <div class="lobby-buttons">
+        <button class="btn btn-primary" id="createBtn" disabled>🐷 Create Game</button>
+        <div class="or-divider"><span>or</span></div>
+        <div class="join-row">
+          <input type="text" id="roomInput" placeholder="Room code" maxlength="4" autocomplete="off">
+          <button class="btn btn-secondary" id="joinBtn" disabled>Join</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="waiting-panel hidden" id="waitingPanel">
+      <div class="waiting-card">
+        <p class="waiting-label">Share this code with the other player:</p>
+        <div class="room-code-big" id="displayCode"></div>
+        <p class="waiting-message">Waiting for player 2…</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="js/deck.js"></script>
+  <script src="js/lobby.js"></script>
+</body>
+</html>

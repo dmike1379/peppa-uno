@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Peppa UNO 🐷</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="game-page">
+
+  <!-- Opponent (top) -->
+  <div class="opponent-area">
+    <div class="player-info">
+      <img class="player-avatar" id="oppAvatar" src="images/avatars/peppa.svg" alt="">
+      <span class="player-name" id="oppName">Waiting…</span>
+      <span class="card-count" id="oppCount">🃏 0</span>
+    </div>
+    <div class="opp-hand" id="oppHand"></div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-area">
+    <div class="pile-row">
+      <div class="pile-wrap">
+        <div class="card card-back pile-card" id="drawPile"><span class="pile-word">DRAW</span></div>
+        <span class="pile-label">Draw</span>
+      </div>
+      <div class="pile-wrap">
+        <div class="card pile-card" id="topCard"></div>
+        <span class="pile-label">Discard</span>
+      </div>
+    </div>
+    <div class="status-bar" id="statusBar">Loading…</div>
+  </div>
+
+  <!-- My area (bottom) -->
+  <div class="my-area" id="myArea">
+    <div class="player-info">
+      <img class="player-avatar" id="myAvatar" src="images/avatars/daddy-pig.svg" alt="">
+      <span class="player-name" id="myName">You</span>
+      <span class="card-count" id="myCount">🃏 0</span>
+    </div>
+    <div class="my-hand" id="myHand"></div>
+  </div>
+
+  <!-- Color picker overlay -->
+  <div class="overlay hidden" id="colorOverlay">
+    <div class="overlay-box">
+      <h3>Choose a color</h3>
+      <div class="color-grid">
+        <button class="color-btn color-red"   data-color="red"   >❤️ Red</button>
+        <button class="color-btn color-yellow" data-color="yellow">💛 Yellow</button>
+        <button class="color-btn color-green"  data-color="green" >💚 Green</button>
+        <button class="color-btn color-blue"   data-color="blue"  >💙 Blue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Win overlay -->
+  <div class="overlay hidden" id="winOverlay">
+    <div class="overlay-box win-box">
+      <div class="win-emoji">🎉</div>
+      <h2 id="winMsg">You Win!</h2>
+      <p id="winSub">🐷 Oink oink!</p>
+      <button class="btn btn-primary" id="playAgainBtn">Play Again</button>
+      <a class="btn btn-outline" href="index.html">Home</a>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="js/deck.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

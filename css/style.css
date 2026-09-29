@@ -37,7 +37,7 @@ body {
 .lobby-container { width: 100%; max-width: 420px; }
 
 .game-header { text-align: center; margin-bottom: 24px; }
-.pig-icon    { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
+.pig-icon    { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; object-position: top center; display: block; flex-shrink: 0; }
 .game-title  { font-size: 36px; color: var(--pink-dark); letter-spacing: -1px; }
 .uno-badge   {
   background: var(--pink-dark); color: var(--white);

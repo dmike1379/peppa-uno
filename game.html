@@ -6,7 +6,8 @@
   <meta name="theme-color" content="#5EC4F5">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <link rel="apple-touch-icon" href="images/avatars/peppa.jpg">
+  <link rel="apple-touch-icon" href="images/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="images/icons/icon-192.png">
   <link rel="manifest" href="manifest.json">
   <title>Peppa UNO 🐷</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -87,5 +88,8 @@
   <script src="js/theme.js"></script>
   <script src="js/deck.js"></script>
   <script src="js/game.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  </script>
 </body>
 </html>

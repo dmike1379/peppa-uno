@@ -36,7 +36,7 @@
     <div class="lobby-card" id="setupPanel">
       <div class="step">
         <div class="step-title"><span class="step-num">1</span> What's your name?</div>
-        <input type="text" id="playerName" placeholder="Linnea" maxlength="12" autocomplete="off" autocapitalize="words">
+        <input type="text" id="playerName" placeholder="Your name" maxlength="12" autocomplete="off" autocapitalize="words">
       </div>
 
       <div class="step">
@@ -59,12 +59,14 @@
 
     <div class="waiting-panel hidden" id="waitingPanel">
       <div class="waiting-card">
-        <p class="waiting-label">Tell the other player this code:</p>
+        <p class="waiting-label">Game code:</p>
         <div class="room-code-big" id="displayCode"></div>
         <button class="btn btn-green" id="shareBtn">📲 Send invite</button>
-        <p class="waiting-message">Waiting for player 2…</p>
+        <div class="player-list" id="playerList"></div>
+        <p class="waiting-message" id="waitingMsg">Waiting for players…</p>
         <div class="waiting-pig">🐷</div>
-        <button class="btn btn-outline" id="cancelBtn">Cancel</button>
+        <button class="btn btn-primary hidden" id="startBtn" disabled>Start game</button>
+        <button class="btn btn-outline" id="cancelBtn">Leave</button>
       </div>
     </div>
   </div>

@@ -5,7 +5,7 @@ let selectedAvatar = null;
 let waitingRef     = null;
 let currentCode    = null;
 
-// Remember name + character on this device (so Linnea doesn't retype every game)
+// Remember name + character on this device (so nobody has to retype it every game)
 function remember(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
 function recall(key)        { try { return localStorage.getItem(key); } catch (e) { return null; } }
 
@@ -85,6 +85,99 @@ function genCode() {
   return Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
+// ─ Players ────────────────────────────────────────────────────
+// Each device gets its own random seat id, so two people joining at the same
+// moment can never grab the same seat. Turn order = the order people joined.
+const MAX_PLAYERS = 4;
+let mySeat  = null;
+let isHost  = false;
+
+function seatId() {
+  return 'p' + Math.random().toString(36).slice(2, 8);
+}
+
+function avatarImg(avatar) {
+  const img = document.createElement('img');
+  img.src = `images/avatars/${avatar}.jpg`;
+  img.onerror = () => {
+    img.onerror = () => { img.onerror = null; img.src = `images/avatars/${avatar}.svg`; };
+    img.src = `images/avatars/${avatar}.png`;
+  };
+  return img;
+}
+
+function sortedSeats(players) {
+  return Object.keys(players || {}).sort((a, b) => (players[a].joinedAt || 0) - (players[b].joinedAt || 0));
+}
+
+// ─ Waiting room ───────────────────────────────────────────────
+function showWaiting(code) {
+  currentCode = code;
+  sessionStorage.setItem('playerSlot', mySeat);
+  sessionStorage.setItem('roomCode',   code);
+  document.getElementById('setupPanel').classList.add('hidden');
+  document.getElementById('waitingPanel').classList.remove('hidden');
+  document.getElementById('displayCode').textContent = code;
+  document.getElementById('startBtn').classList.toggle('hidden', !isHost);
+
+  waitingRef = db.ref(`games/${code}`);
+  waitingRef.on('value', snap => {
+    if (!snap.exists()) {            // host cancelled
+      waitingRef.off(); resetToSetup();
+      alert('The game was cancelled.');
+      return;
+    }
+    const g = snap.val();
+    if (g.state === 'playing') {
+      waitingRef.off();
+      window.location.href = `game.html?room=${code}`;
+      return;
+    }
+    renderWaiting(g);
+  });
+}
+
+function renderWaiting(g) {
+  const players = g.players || {};
+  const seats   = sortedSeats(players);
+  const list    = document.getElementById('playerList');
+  list.innerHTML = '';
+  for (let i = 0; i < MAX_PLAYERS; i++) {
+    const el = document.createElement('div');
+    if (seats[i]) {
+      const p = players[seats[i]];
+      el.className = seats[i] === mySeat ? 'player-slot me' : 'player-slot';
+      const span = document.createElement('span');
+      span.textContent = p.name;
+      el.append(avatarImg(p.avatar), span);
+    } else {
+      el.className = 'player-slot empty';
+      el.innerHTML = '<div class="empty-dot">?</div><span>Open</span>';
+    }
+    list.appendChild(el);
+  }
+
+  const n   = seats.length;
+  const msg = document.getElementById('waitingMsg');
+  const btn = document.getElementById('startBtn');
+  const hostName = players[g.host] ? players[g.host].name : 'the host';
+  if (isHost) {
+    btn.disabled    = n < 2;
+    btn.textContent = n < 2 ? 'Need 1 more player' : `${getSkin().emoji} Start game (${n} players)`;
+    msg.textContent = n < MAX_PLAYERS ? 'Send the invite, then tap Start when everyone is in.' : 'The table is full!';
+  } else {
+    msg.textContent = `Waiting for ${hostName} to start…`;
+  }
+}
+
+function resetToSetup() {
+  currentCode = null; mySeat = null; isHost = false;
+  document.getElementById('waitingPanel').classList.add('hidden');
+  document.getElementById('setupPanel').classList.remove('hidden');
+  createBtn.disabled = false;
+  checkReady();
+}
+
 // ─ Create ─────────────────────────────────────────────────────
 createBtn.addEventListener('click', async () => {
   const name = nameInput.value.trim();
@@ -92,48 +185,50 @@ createBtn.addEventListener('click', async () => {
   remember('pu_avatar', selectedAvatar);
   createBtn.disabled = true;
 
-  const code = genCode();
-  const deck = createDeck();
+  // Make sure the code isn't already in use
+  let code = genCode();
+  for (let i = 0; i < 5 && (await db.ref(`games/${code}`).get()).exists(); i++) code = genCode();
 
-  // Deal 7 cards each
-  const p1Hand = deck.splice(0, 7);
-  const p2Hand = deck.splice(0, 7);
+  mySeat = seatId();
+  isHost = true;
+  await db.ref(`games/${code}`).set({
+    state:     'waiting',
+    host:      mySeat,
+    players:   { [mySeat]: { name, avatar: selectedAvatar, joinedAt: Date.now() } },
+    createdAt: Date.now()
+  });
+  showWaiting(code);
+});
+
+// ─ Start (host only): deal everyone in ────────────────────────
+document.getElementById('startBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('startBtn');
+  btn.disabled = true;
+  const snap = await db.ref(`games/${currentCode}`).get();
+  if (!snap.exists()) return;
+  const g     = snap.val();
+  const order = sortedSeats(g.players).slice(0, MAX_PLAYERS);
+  if (order.length < 2) { btn.disabled = false; return; }
+
+  const deck  = createDeck();
+  const hands = {};
+  order.forEach(seat => { hands[seat] = deck.splice(0, 7); });
 
   // First discard must be a number card to avoid start-of-game complexity
   const startIdx  = deck.findIndex(c => c.type === 'number');
   const startCard = deck.splice(startIdx, 1)[0];
 
-  const state = {
-    state:         'waiting',
-    players:       { p1: { name, avatar: selectedAvatar } },
-    hands:         { p1: p1Hand, p2: p2Hand },
+  await db.ref(`games/${currentCode}`).update({
+    hands,
+    order,
+    direction:     1,
     drawPile:      deck,
     discardPile:   [startCard],
     currentColor:  startCard.color,
-    currentPlayer: 'p1',
+    currentPlayer: order[0],
     winner:        null,
-    lastAction:    getSkin().started(name),
-    createdAt:     Date.now()
-  };
-
-  await db.ref(`games/${code}`).set(state);
-  sessionStorage.setItem('playerSlot', 'p1');
-  sessionStorage.setItem('roomCode',   code);
-  currentCode = code;
-
-  document.getElementById('setupPanel').classList.add('hidden');
-  document.getElementById('waitingPanel').classList.remove('hidden');
-  document.getElementById('displayCode').textContent = code;
-
-  // Wait for p2 to join, then start
-  waitingRef = db.ref(`games/${code}/players/p2`);
-  waitingRef.on('value', snap => {
-    if (snap.exists()) {
-      waitingRef.off();
-      db.ref(`games/${code}/state`).set('playing').then(() => {
-        window.location.href = `game.html?room=${code}`;
-      });
-    }
+    lastAction:    getSkin().started(g.players[g.host].name),
+    state:         'playing'
   });
 });
 
@@ -155,14 +250,17 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
   }
 });
 
-// ─ Cancel waiting ─────────────────────────────────────────────
+// ─ Leave waiting room ─────────────────────────────────────────
+// Host leaving cancels the whole game; anyone else just gives up their seat.
 document.getElementById('cancelBtn').addEventListener('click', async () => {
   if (waitingRef) waitingRef.off();
-  if (currentCode) { try { await db.ref(`games/${currentCode}`).remove(); } catch (e) {} }
-  currentCode = null;
-  document.getElementById('waitingPanel').classList.add('hidden');
-  document.getElementById('setupPanel').classList.remove('hidden');
-  checkReady();
+  if (currentCode) {
+    try {
+      if (isHost) await db.ref(`games/${currentCode}`).remove();
+      else        await db.ref(`games/${currentCode}/players/${mySeat}`).remove();
+    } catch (e) {}
+  }
+  resetToSetup();
 });
 
 // ─ Join ───────────────────────────────────────────────────────
@@ -182,9 +280,13 @@ joinBtn.addEventListener('click', async () => {
     alert('That game has already started.');
     return;
   }
+  if (Object.keys(game.players || {}).length >= MAX_PLAYERS) {
+    alert(`That game is full (${MAX_PLAYERS} players max).`);
+    return;
+  }
 
-  await db.ref(`games/${code}/players/p2`).set({ name, avatar: selectedAvatar });
-  sessionStorage.setItem('playerSlot', 'p2');
-  sessionStorage.setItem('roomCode',   code);
-  window.location.href = `game.html?room=${code}`;
+  mySeat = seatId();
+  isHost = false;
+  await db.ref(`games/${code}/players/${mySeat}`).set({ name, avatar: selectedAvatar, joinedAt: Date.now() });
+  showWaiting(code);
 });

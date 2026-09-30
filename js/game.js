@@ -4,7 +4,6 @@ const db = firebase.database();
 const params   = new URLSearchParams(window.location.search);
 const roomCode = params.get('room') || sessionStorage.getItem('roomCode');
 const mySlot   = sessionStorage.getItem('playerSlot') || 'p1';
-const oppSlot  = mySlot === 'p1' ? 'p2' : 'p1';
 
 if (!roomCode) { window.location.href = 'index.html'; }
 
@@ -62,6 +61,20 @@ function refill(drawPile, discardPile) {
   return { drawPile: rest, discardPile: [top] };
 }
 
+// ─ Turn order ─────────────────────────────────────────────────
+// order = seats in the order they joined; direction = 1 or -1 (Reverse flips it).
+// Older 2-player games have no order saved, so fall back to their seats.
+function seatOrder(s) {
+  const o = arr(s.order);
+  return o.length ? o : Object.keys(s.players || {}).sort();
+}
+function seatAfter(s, seat, steps = 1, dir = s.direction || 1) {
+  const o = seatOrder(s);
+  const n = o.length;
+  const i = o.indexOf(seat);
+  return o[(((i + dir * steps) % n) + n) % n];
+}
+
 function countText(n) {
   if (n === 1) return 'UNO!';
   return `${n} cards`;
@@ -117,6 +130,55 @@ function sizeHand(n) {
   handEl.style.setProperty('--card-w', `${Math.max(40, Math.min(w, 84))}px`);
 }
 
+// Everyone else, listed in the order their turns come after mine.
+// One opponent: the big strip with a fan of cards. Two or more: a row of tiles.
+function renderOpponents(state, playing) {
+  const hands  = state.hands || {};
+  const o      = seatOrder(state);
+  const others = [];
+  for (let k = 1; k < o.length; k++) others.push(seatAfter(state, mySlot, k, 1));
+  const box = document.getElementById('opponents');
+  box.innerHTML = '';
+  box.className = others.length > 1 ? 'opponents many' : 'opponents';
+
+  others.forEach(seat => {
+    const p = state.players[seat];
+    if (!p) return;
+    const n      = arr(hands[seat]).length;
+    const active = playing && state.currentPlayer === seat;
+
+    if (others.length === 1) {
+      const info = document.createElement('div');
+      info.className = `player-info${active ? ' active' : ''}`;
+      info.innerHTML = '<img class="player-avatar" alt=""><span class="player-name"></span><span class="card-count"></span>';
+      setAvatar(info.querySelector('img'), p.avatar);
+      info.querySelector('.player-name').textContent = p.name;
+      const c = info.querySelector('.card-count');
+      c.textContent = countText(n); c.classList.toggle('uno', n === 1);
+      const fan = document.createElement('div');
+      fan.className = 'opp-hand';
+      for (let i = 0; i < n; i++) fan.appendChild(buildFaceDown());
+      box.append(info, fan);
+    } else {
+      const tile = document.createElement('div');
+      tile.className = `opp-tile${active ? ' active' : ''}`;
+      tile.innerHTML = '<img class="player-avatar" alt=""><span class="opp-name"></span><span class="card-count"></span>';
+      setAvatar(tile.querySelector('img'), p.avatar);
+      tile.querySelector('.opp-name').textContent = p.name;
+      const c = tile.querySelector('.card-count');
+      c.textContent = countText(n); c.classList.toggle('uno', n === 1);
+      box.appendChild(tile);
+    }
+  });
+
+  // Which way turns are going (only matters with 3+ players)
+  const dirEl = document.getElementById('turnDir');
+  if (dirEl) {
+    dirEl.classList.toggle('hidden', o.length < 3);
+    dirEl.textContent = (state.direction || 1) === 1 ? 'Turns go ➜' : '⬅ Turns go';
+  }
+}
+
 // ─ Render ─────────────────────────────────────────────────────
 
 function renderGame(state) {
@@ -126,10 +188,8 @@ function renderGame(state) {
   const playing  = state.state === 'playing';
   const isMyTurn = state.currentPlayer === mySlot && playing;
   const me       = state.players[mySlot];
-  const opp      = state.players[oppSlot];
   const hands    = state.hands || {};
   const myHand   = arr(hands[mySlot]);
-  const oppHand  = arr(hands[oppSlot]);
   const discard  = arr(state.discardPile);
   const top      = discard[discard.length - 1];
   const color    = state.currentColor;
@@ -142,19 +202,7 @@ function renderGame(state) {
   myCount.classList.toggle('uno', myHand.length === 1);
   document.getElementById('myInfo').classList.toggle('active', isMyTurn);
 
-  if (opp) {
-    document.getElementById('oppName').textContent = opp.name;
-    setAvatar(document.getElementById('oppAvatar'), opp.avatar);
-    const oppCount = document.getElementById('oppCount');
-    oppCount.textContent = countText(oppHand.length);
-    oppCount.classList.toggle('uno', oppHand.length === 1);
-  }
-  document.getElementById('oppInfo').classList.toggle('active', playing && !isMyTurn);
-
-  // Opponent face-down fan
-  const oppHandEl = document.getElementById('oppHand');
-  oppHandEl.innerHTML = '';
-  oppHand.forEach(() => oppHandEl.appendChild(buildFaceDown()));
+  renderOpponents(state, playing);
 
   // Top of the muddy puddle
   const topEl = document.getElementById('topCard');
@@ -198,7 +246,8 @@ function renderGame(state) {
       ? 'Tap a shiny card to play it'
       : 'No match — tap the Draw pile!';
   } else {
-    main.textContent = `${opp ? opp.name : 'Other player'}'s turn…`;
+    const cur = state.players[state.currentPlayer];
+    main.textContent = `${cur ? cur.name : 'Other player'}'s turn…`;
     sub.textContent  = state.lastAction || '';
   }
   if (isMyTurn && state.lastAction && anyPlayable) {
@@ -243,30 +292,46 @@ async function doPlay(card, chosenColor) {
     let discard    = [...arr(s.discardPile), card];
     const newColor = card.color === 'wild' ? chosenColor : card.color;
     const myName   = s.players[mySlot].name;
-    const oppName  = s.players[oppSlot].name;
+    const players  = seatOrder(s).length;
+    let   dir      = s.direction || 1;
 
-    let nextPlayer = oppSlot;
+    let nextPlayer = seatAfter(s, mySlot, 1, dir);
     let action     = `${myName} played ${label(card)}`;
     const upd      = {};
 
-    // Skip / Reverse (2-player reverse = skip)
-    if (card.type === 'skip' || card.type === 'reverse') {
-      nextPlayer = mySlot;
-      action    += ` — ${myName} goes again!`;
+    // Skip: jump over the next player (with 2 players, that means I go again)
+    if (card.type === 'skip') {
+      const skipped = s.players[seatAfter(s, mySlot, 1, dir)].name;
+      nextPlayer = seatAfter(s, mySlot, 2, dir);
+      action    += nextPlayer === mySlot ? ` — ${myName} goes again!` : ` — ${skipped} is skipped!`;
     }
 
-    // Draw Two / Wild Draw Four: give opponent cards and skip their turn
+    // Reverse: flip direction. With 2 players it works like Skip.
+    if (card.type === 'reverse') {
+      if (players === 2) {
+        nextPlayer = mySlot;
+        action    += ` — ${myName} goes again!`;
+      } else {
+        dir        = -dir;
+        upd.direction = dir;
+        nextPlayer = seatAfter(s, mySlot, 1, dir);
+        action    += ' — turns switch direction!';
+      }
+    }
+
+    // Draw Two / Wild Draw Four: next player draws and loses their turn
     const give = card.type === 'draw_two' ? 2 : card.type === 'wild_draw_four' ? 4 : 0;
     if (give) {
-      const oppHand = arr(hands[oppSlot]);
+      const victim     = seatAfter(s, mySlot, 1, dir);
+      const victimHand = arr(hands[victim]);
       for (let i = 0; i < give; i++) {
         const r = refill(drawPile, discard);
         drawPile = r.drawPile; discard = r.discardPile;
-        if (drawPile.length) oppHand.push(drawPile.shift());
+        if (drawPile.length) victimHand.push(drawPile.shift());
       }
-      upd[`hands/${oppSlot}`] = oppHand;
-      nextPlayer = mySlot;
-      action    += ` — ${oppName} draws ${give}!`;
+      upd[`hands/${victim}`] = victimHand;
+      nextPlayer = seatAfter(s, mySlot, 2, dir);
+      action    += ` — ${s.players[victim].name} draws ${give}!`;
     }
 
     if (card.color === 'wild') action += ` Color is ${newColor}.`;
@@ -304,7 +369,7 @@ async function onDrawClick() {
 
     // No cards left anywhere: just pass the turn so the game can't get stuck
     if (!drawPile.length) {
-      await gameRef.update({ currentPlayer: oppSlot, lastAction: `${myName} passed — no cards left to draw` });
+      await gameRef.update({ currentPlayer: seatAfter(s, mySlot), lastAction: `${myName} passed — no cards left to draw` });
       return;
     }
 
@@ -313,7 +378,7 @@ async function onDrawClick() {
       [`hands/${mySlot}`]: myHand,
       drawPile,
       discardPile:   discard,
-      currentPlayer: oppSlot,
+      currentPlayer: seatAfter(s, mySlot),
       lastAction:    `${myName} drew a card`
     });
   } finally {

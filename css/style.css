@@ -64,6 +64,67 @@
   --shadow:      0 6px 16px rgba(33, 56, 74, .22);
 }
 
+/* Spidey — city rooftops at dusk, and a web in the middle */
+:root[data-skin="spidey"] {
+  --pink:        #E63946;
+  --pink-dark:   #C1121F;
+  --pink-light:  #F7C1C6;
+  --pink-shadow: #850A14;
+  --sky-top:     #16235C;
+  --sky-bottom:  #4F6FC4;
+  --grass:       #22306B;
+  --grass-dark:  #182352;
+  --mud:         #2C3A7A;
+  --mud-light:   #5566B0;
+  --ink:         #1B1F3B;
+
+  --tint-bg:     #F4F6FD;
+  --rule:        #DDE2F4;
+  --placeholder: #A9B1CF;
+  --divider-txt: #8C95B8;
+  --label-strong:#4A5378;
+  --label-soft:  #737C9F;
+  --muted:       #626B8E;
+
+  --shadow:      0 6px 16px rgba(10, 16, 48, .35);
+}
+
+/* Web: spokes (conic) + rings (radial), drawn in thin light lines */
+:root[data-skin="spidey"] .game-page {
+  background:
+    repeating-conic-gradient(from 0deg at 100% 0%, rgba(255,255,255,.14) 0 .6deg, transparent .6deg 10deg),
+    repeating-radial-gradient(circle at 100% 0%, transparent 0 34px, rgba(255,255,255,.12) 34px 36px),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 75%);
+  background-attachment: fixed;
+}
+:root[data-skin="spidey"] .scene {
+  background:
+    linear-gradient(180deg, transparent 78%, var(--grass) 78%) fixed,
+    repeating-conic-gradient(from 0deg at 100% 0%, rgba(255,255,255,.14) 0 .6deg, transparent .6deg 10deg) fixed,
+    repeating-radial-gradient(circle at 100% 0%, transparent 0 34px, rgba(255,255,255,.12) 34px 36px) fixed,
+    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 75%) fixed;
+}
+:root[data-skin="spidey"] .cloud { opacity: .18; }
+:root[data-skin="spidey"] .game-title { color: #fff; text-shadow: 0 3px 0 var(--pink-dark), 0 5px 10px rgba(0,0,0,.35); }
+:root[data-skin="spidey"] .card-back {
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%, rgba(0,0,0,.35) 0 1.2deg, transparent 1.2deg 30deg),
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 9px, rgba(0,0,0,.35) 9px 10px),
+    var(--pink-dark);
+}
+:root[data-skin="spidey"] .card-fd {
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%, rgba(0,0,0,.35) 0 2deg, transparent 2deg 45deg),
+    var(--pink-dark);
+}
+:root[data-skin="spidey"] .puddle::before {
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.55) 0 1.5deg, transparent 1.5deg 30deg),
+    repeating-radial-gradient(ellipse at 50% 50%, transparent 0 10px, rgba(255,255,255,.45) 10px 11.5px),
+    rgba(255,255,255,.08);
+  box-shadow: none;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 html, body { height: 100%; }

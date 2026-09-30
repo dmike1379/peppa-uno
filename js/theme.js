@@ -57,7 +57,34 @@ const SKINS = {
   }
 };
 
-const SKIN_ORDER = ['peppa', 'bluey'];
+SKINS.spidey = {
+  id:    'spidey',
+  name:  'Spidey',
+  emoji: '🕷️',
+  logo:  'spider-man',
+  appName: 'Spidey UNO',
+  themeColor: '#16235C',
+  discardLabel: 'The web',
+  startBtn:  '🕷️ Start a new game',
+  playAgain: '🕷️ Play again',
+  yourTurn:  name => `Your turn, ${name}! 🕸️`,
+  started:   name => `${name} started the game 🕷️`,
+  shareText: code => `Come play Spidey UNO with me! 🕷️ Code: ${code}`,
+  winSub:  'Thwip! You saved the day! 🕸️',
+  loseSub: 'Great game, hero! Play again? 🕷️',
+  noGame:  'Oops! No game with that code. Check it and try again. 🕷️',
+  characters: [
+    { id: 'spider-man',      name: 'Spidey'     },
+    { id: 'miles-morales',   name: 'Miles'      },
+    { id: 'spider-gwen',     name: 'Gwen'       },
+    { id: 'iron-man',        name: 'Iron Man'   },
+    { id: 'captain-america', name: 'Cap'        },
+    { id: 'black-widow',     name: 'Widow'      },
+    { id: 'venom',           name: 'Venom'      },
+  ]
+};
+
+const SKIN_ORDER = ['peppa', 'bluey', 'spidey'];
 
 let currentSkinId = (() => {
   try {

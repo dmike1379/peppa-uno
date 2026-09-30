@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="100" fill="#D4762A"/>
+  <circle cx="100" cy="100" r="96" fill="#CE8440"/>
+  <!-- Ears -->
+  <path d="M58 58 L50 18 L86 44 Z" fill="#CE8440"/>
+  <path d="M142 58 L150 18 L114 44 Z" fill="#CE8440"/>
+  <path d="M61 56 L56 30 L82 48 Z" fill="#E8A661"/>
+  <path d="M139 56 L144 30 L118 48 Z" fill="#E8A661"/>
+  <!-- Head -->
+  <ellipse cx="100" cy="94" rx="50" ry="46" fill="#E8A661"/>
+  <!-- Brow patches -->
+  <ellipse cx="80" cy="76" rx="17" ry="13" fill="#CE8440" opacity="0.75"/>
+  <ellipse cx="120" cy="76" rx="17" ry="13" fill="#CE8440" opacity="0.75"/>
+  <!-- Muzzle -->
+  <ellipse cx="100" cy="112" rx="28" ry="21" fill="#F7E8D2"/>
+  <ellipse cx="100" cy="99" rx="9" ry="7" fill="#2B2B2B"/>
+  <path d="M100 106 L100 116" stroke="#2B2B2B" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M100 116 Q90 124 84 115" stroke="#2B2B2B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M100 116 Q110 124 116 115" stroke="#2B2B2B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Eyes -->
+  <circle cx="81" cy="80" r="9" fill="white"/>
+  <circle cx="119" cy="80" r="9" fill="white"/>
+  <circle cx="83" cy="81" r="4.5" fill="#1a1a1a"/>
+  <circle cx="121" cy="81" r="4.5" fill="#1a1a1a"/>
+  <circle cx="84.5" cy="79" r="1.6" fill="white"/>
+  <circle cx="122.5" cy="79" r="1.6" fill="white"/>
+  <!-- Name -->
+  <text x="100" y="167" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="22" font-weight="bold">BINGO</text>
+  <text x="100" y="185" text-anchor="middle" fill="rgba(255,255,255,0.75)" font-family="Arial, sans-serif" font-size="10">Replace with AI avatar</text>
+</svg>

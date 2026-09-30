@@ -15,6 +15,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Set the skin before first paint so the page never flashes the other one.
+    try { document.documentElement.dataset.skin = localStorage.getItem('pu_skin') || 'peppa'; } catch (e) {}
+  </script>
 </head>
 <body class="lobby-page scene">
   <div class="cloud c1"></div>
@@ -22,9 +26,12 @@
 
   <div class="lobby-container">
     <header class="game-header">
-      <img class="pig-icon" src="images/avatars/peppa.jpg" alt="Peppa" width="72" height="72">
-      <h1 class="game-title">Peppa <span class="uno-badge">UNO</span></h1>
+      <img class="pig-icon" id="skinLogo" src="images/avatars/peppa.jpg" alt="Peppa" width="72" height="72">
+      <h1 class="game-title"><span id="skinTitle">Peppa</span> <span class="uno-badge">UNO</span></h1>
     </header>
+    <div class="skin-switch">
+      <button class="skin-toggle" id="skinToggle" type="button">Switch skin</button>
+    </div>
 
     <div class="lobby-card" id="setupPanel">
       <div class="step">
@@ -65,6 +72,7 @@
   <script src="js/config.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="js/theme.js"></script>
   <script src="js/deck.js"></script>
   <script src="js/lobby.js"></script>
 </body>

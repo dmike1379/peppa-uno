@@ -13,6 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script>
+    try { document.documentElement.dataset.skin = localStorage.getItem('pu_skin') || 'peppa'; } catch (e) {}
+  </script>
 </head>
 <body class="game-page">
   <div class="cloud c1"></div>
@@ -40,7 +43,7 @@
       </div>
       <div class="pile-wrap puddle">
         <div class="card" id="topCard"></div>
-        <span class="pile-label">Muddy puddle</span>
+        <span class="pile-label" id="discardLabel">Muddy puddle</span>
       </div>
     </div>
     <div class="status-bar" id="statusBar">
@@ -85,6 +88,7 @@
   <script src="js/config.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="js/theme.js"></script>
   <script src="js/deck.js"></script>
   <script src="js/game.js"></script>
 </body>

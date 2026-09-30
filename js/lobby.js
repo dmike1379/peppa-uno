@@ -1,13 +1,3 @@
-const CHARACTERS = [
-  { id: 'peppa',          name: 'Peppa'   },
-  { id: 'daddy-pig',      name: 'Daddy'   },
-  { id: 'george',         name: 'George'  },
-  { id: 'suzy-sheep',     name: 'Suzy'    },
-  { id: 'rebecca-rabbit', name: 'Rebecca' },
-  { id: 'danny-dog',      name: 'Danny'   },
-  { id: 'pedro-pony',     name: 'Pedro'   },
-];
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
@@ -21,25 +11,32 @@ function recall(key)        { try { return localStorage.getItem(key); } catch (e
 
 // ─ Avatar picker ──────────────────────────────────────────────
 const grid = document.getElementById('avatarGrid');
-CHARACTERS.forEach(ch => {
-  const el = document.createElement('button');
-  el.type = 'button';
-  el.className = 'avatar-opt';
-  el.dataset.id = ch.id;
-  const img = document.createElement('img');
-  img.alt = ch.name;
-  // Try JPG (custom art), then PNG, then SVG placeholder
-  img.src = `images/avatars/${ch.id}.jpg`;
-  img.onerror = () => {
-    img.onerror = () => { img.onerror = null; img.src = `images/avatars/${ch.id}.svg`; };
-    img.src = `images/avatars/${ch.id}.png`;
-  };
-  const span = document.createElement('span');
-  span.textContent = ch.name;
-  el.append(img, span);
-  el.addEventListener('click', () => selectAvatar(ch.id));
-  grid.appendChild(el);
-});
+
+function buildAvatarGrid() {
+  grid.innerHTML = '';
+  selectedAvatar = null;
+  getSkin().characters.forEach(ch => {
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'avatar-opt';
+    el.dataset.id = ch.id;
+    const img = document.createElement('img');
+    img.alt = ch.name;
+    // Try JPG (custom art), then PNG, then SVG placeholder
+    img.src = `images/avatars/${ch.id}.jpg`;
+    img.onerror = () => {
+      img.onerror = () => { img.onerror = null; img.src = `images/avatars/${ch.id}.svg`; };
+      img.src = `images/avatars/${ch.id}.png`;
+    };
+    const span = document.createElement('span');
+    span.textContent = ch.name;
+    el.append(img, span);
+    el.addEventListener('click', () => selectAvatar(ch.id));
+    grid.appendChild(el);
+  });
+}
+
+buildAvatarGrid();
 
 function selectAvatar(id) {
   document.querySelectorAll('.avatar-opt').forEach(a => a.classList.toggle('sel', a.dataset.id === id));
@@ -68,10 +65,20 @@ function checkReady() {
 const savedName   = recall('pu_name');
 const savedAvatar = recall('pu_avatar');
 if (savedName) nameInput.value = savedName;
-if (savedAvatar && CHARACTERS.some(c => c.id === savedAvatar)) selectAvatar(savedAvatar);
+if (savedAvatar && getSkin().characters.some(c => c.id === savedAvatar)) selectAvatar(savedAvatar);
 const inviteCode = new URLSearchParams(location.search).get('join');
 if (inviteCode) roomInput.value = inviteCode.toUpperCase().slice(0, 4);
 checkReady();
+
+// ─ Skin switch ────────────────────────────────────────────────
+// Rebuilding the grid clears the selection, since the new skin has its own cast.
+document.getElementById('skinToggle').addEventListener('click', () => {
+  setSkin(nextSkinId());
+  buildAvatarGrid();
+  const saved = recall('pu_avatar');
+  if (saved && getSkin().characters.some(c => c.id === saved)) selectAvatar(saved);
+  checkReady();
+});
 
 function genCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -105,7 +112,7 @@ createBtn.addEventListener('click', async () => {
     currentColor:  startCard.color,
     currentPlayer: 'p1',
     winner:        null,
-    lastAction:    `${name} started the game 🐷`,
+    lastAction:    getSkin().started(name),
     createdAt:     Date.now()
   };
 
@@ -133,10 +140,10 @@ createBtn.addEventListener('click', async () => {
 // ─ Share invite ───────────────────────────────────────────────
 document.getElementById('shareBtn').addEventListener('click', async () => {
   const url  = `${location.origin}${location.pathname}?join=${currentCode}`;
-  const text = `Come play Peppa UNO with me! 🐷 Code: ${currentCode}`;
+  const text = getSkin().shareText(currentCode);
   const btn  = document.getElementById('shareBtn');
   if (navigator.share) {
-    try { await navigator.share({ title: 'Peppa UNO', text, url }); } catch (e) { /* user cancelled */ }
+    try { await navigator.share({ title: getSkin().appName, text, url }); } catch (e) { /* user cancelled */ }
     return;
   }
   try {
@@ -167,7 +174,7 @@ joinBtn.addEventListener('click', async () => {
 
   const snap = await db.ref(`games/${code}`).get();
   if (!snap.exists()) {
-    alert('Oops! No game with that code. Check it and try again. 🐷');
+    alert(getSkin().noGame);
     return;
   }
   const game = snap.val();

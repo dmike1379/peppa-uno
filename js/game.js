@@ -193,7 +193,7 @@ function renderGame(state) {
     main.textContent = 'Game over!';
     sub.textContent  = state.lastAction || '';
   } else if (isMyTurn) {
-    main.textContent = `Your turn, ${me.name}! 🐷`;
+    main.textContent = getSkin().yourTurn(me.name);
     sub.textContent  = anyPlayable
       ? 'Tap a shiny card to play it'
       : 'No match — tap the Draw pile!';
@@ -353,7 +353,7 @@ function showWin(winSlot, players) {
   const winner = players[winSlot] || { name: 'Other player', avatar: 'peppa' };
   setAvatar(document.getElementById('winAvatar'), winner.avatar);
   document.getElementById('winMsg').textContent = isMe ? 'You win! 🎉' : `${winner.name} wins!`;
-  document.getElementById('winSub').textContent = isMe ? 'Oink oink! Hooray! 🐷' : 'Great game! Play again? 🐷';
+  document.getElementById('winSub').textContent = isMe ? getSkin().winSub : getSkin().loseSub;
   document.getElementById('winOverlay').classList.remove('hidden');
   confetti();
 }

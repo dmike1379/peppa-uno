@@ -1,28 +1,67 @@
 /* ═══════════════════════════════════════════════════
-   Peppa UNO — sky, hills and muddy puddles
+   UNO — two skins share one scene: sky, ground, and a
+   pile in the middle. Skin tokens below; everything
+   else is built from them.
    ═══════════════════════════════════════════════════ */
 
+/* Peppa — sky, hills and muddy puddles */
 :root {
   --pink:        #FF7EB6;
   --pink-dark:   #E0457B;
   --pink-light:  #FFC6DD;
+  --pink-shadow: #B32E5E;
   --sky-top:     #5EC4F5;
   --sky-bottom:  #BDE9FF;
   --grass:       #6CC24A;
   --grass-dark:  #4E9E33;
   --mud:         #8A5A3B;
   --mud-light:   #A8744F;
+  --ink:         #3A2340;
+
+  /* Neutrals tinted toward the skin's brand hue */
+  --tint-bg:     #FFF5FA;
+  --rule:        #F3DCEA;
+  --placeholder: #c9b3c5;
+  --divider-txt: #b89bb2;
+  --label-strong:#7a5f77;
+  --label-soft:  #9c8399;
+  --muted:       #8a7087;
+
   --red:         #F2464B;
   --yellow:      #FFC928;
   --green:       #3FB950;
   --blue:        #3B8BEB;
-  --ink:         #3A2340;
   --white:       #ffffff;
   --gold:        #FFD84D;
   --card-w:      70px;
   --shadow:      0 6px 16px rgba(58, 35, 64, .22);
   --safe-top:    env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Bluey — backyard, big sky and a sandpit */
+:root[data-skin="bluey"] {
+  --pink:        #4FA8DC;
+  --pink-dark:   #2C7BB0;
+  --pink-light:  #B5DCF2;
+  --pink-shadow: #22608C;
+  --sky-top:     #6BC9EE;
+  --sky-bottom:  #CFEDFA;
+  --grass:       #8CC63F;
+  --grass-dark:  #6BA32E;
+  --mud:         #C08A4A;
+  --mud-light:   #DDAE72;
+  --ink:         #21384A;
+
+  --tint-bg:     #F2F9FD;
+  --rule:        #D8EAF5;
+  --placeholder: #A8BECD;
+  --divider-txt: #8FA8B8;
+  --label-strong:#4E6A7D;
+  --label-soft:  #7791A2;
+  --muted:       #64808F;
+
+  --shadow:      0 6px 16px rgba(33, 56, 74, .22);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -82,8 +121,22 @@ button, input { font-family: inherit; }
 
 .game-header {
   display: flex; align-items: center; justify-content: center; gap: 12px;
-  margin: 8px 0 18px;
+  margin: 8px 0 10px;
 }
+
+.skin-switch { display: flex; justify-content: center; margin-bottom: 16px; }
+.skin-toggle {
+  background: #fff;
+  color: var(--pink-dark);
+  border: 3px solid var(--pink-light);
+  border-radius: 22px;
+  padding: 7px 18px;
+  font-size: 16px; font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(0,0,0,.10);
+  transition: transform .1s, background .15s;
+}
+.skin-toggle:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.10); }
 .pig-icon {
   width: 72px; height: 72px; border-radius: 50%;
   object-fit: cover; object-position: top center;
@@ -138,7 +191,7 @@ input[type="text"] {
   transition: border-color .2s;
 }
 input[type="text"]:focus { border-color: var(--pink); }
-input::placeholder { color: #c9b3c5; }
+input::placeholder { color: var(--placeholder); }
 
 .avatar-grid {
   display: grid;
@@ -150,7 +203,7 @@ input::placeholder { color: #c9b3c5; }
   padding: 8px 2px 6px;
   border-radius: 18px;
   border: 3px solid transparent;
-  background: #FFF5FA;
+  background: var(--tint-bg);
   cursor: pointer;
   transition: transform .15s, background .15s, border-color .15s;
 }
@@ -172,10 +225,10 @@ input::placeholder { color: #c9b3c5; }
 
 .or-divider {
   display: flex; align-items: center; gap: 10px;
-  color: #b89bb2; font-size: 15px; font-weight: 600;
+  color: var(--divider-txt); font-size: 15px; font-weight: 600;
 }
 .or-divider::before, .or-divider::after {
-  content: ''; flex: 1; height: 3px; border-radius: 3px; background: #F3DCEA;
+  content: ''; flex: 1; height: 3px; border-radius: 3px; background: var(--rule);
 }
 
 .join-row { display: flex; gap: 10px; }
@@ -187,12 +240,12 @@ input::placeholder { color: #c9b3c5; }
 
 .waiting-panel { margin-top: 4px; }
 .waiting-card { text-align: center; }
-.waiting-label   { font-size: 18px; color: #7a5f77; margin-bottom: 6px; }
+.waiting-label   { font-size: 18px; color: var(--label-strong); margin-bottom: 6px; }
 .room-code-big   {
   font-size: 64px; font-weight: 700; color: var(--pink-dark);
   letter-spacing: 12px; margin: 6px 0 14px; padding-left: 12px;
 }
-.waiting-message { color: #9c8399; font-size: 17px; margin: 14px 0 6px; }
+.waiting-message { color: var(--label-soft); font-size: 17px; margin: 14px 0 6px; }
 .waiting-pig { font-size: 44px; display: inline-block; animation: hop 1s ease-in-out infinite; }
 
 @keyframes hop {
@@ -214,7 +267,7 @@ input::placeholder { color: #c9b3c5; }
 .btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.18); }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
 
-.btn-primary   { background: var(--pink-dark); color: #fff; width: 100%; box-shadow: 0 4px 0 #B32E5E; }
+.btn-primary   { background: var(--pink-dark); color: #fff; width: 100%; box-shadow: 0 4px 0 var(--pink-shadow); }
 .btn-secondary { background: var(--blue); color: #fff; box-shadow: 0 4px 0 #2766B0; }
 .btn-green     { background: var(--green); color: #fff; width: 100%; box-shadow: 0 4px 0 #2A8A39; }
 .btn-outline   {
@@ -342,7 +395,7 @@ input::placeholder { color: #c9b3c5; }
   border: 3px solid #fff;
 }
 .status-main { font-size: 22px; font-weight: 700; color: var(--pink-dark); line-height: 1.2; }
-.status-sub  { font-size: 15px; font-weight: 500; color: #8a7087; margin-top: 2px; min-height: 18px; }
+.status-sub  { font-size: 15px; font-weight: 500; color: var(--muted); margin-top: 2px; min-height: 18px; }
 .status-bar.my-turn {
   background: var(--gold);
   border-color: #fff;
@@ -514,7 +567,7 @@ input::placeholder { color: #c9b3c5; }
   background: #fff;
 }
 .win-box h2 { font-size: 34px; color: var(--pink-dark); margin-bottom: 4px; }
-.win-box p  { color: #8a7087; font-size: 20px; margin-bottom: 20px; }
+.win-box p  { color: var(--muted); font-size: 20px; margin-bottom: 20px; }
 
 /* Confetti */
 .confetti {

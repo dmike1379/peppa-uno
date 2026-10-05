@@ -140,9 +140,9 @@ function applySkin() {
     logo.alt = skin.name;
     logo.onerror = () => {
       logo.onerror = () => { logo.onerror = null; logo.src = `images/avatars/${skin.logo}.svg`; };
-      logo.src = `images/avatars/${skin.logo}.png`;
+      logo.src = `images/avatars/${skin.logo}.jpg`;
     };
-    logo.src = `images/avatars/${skin.logo}.jpg`;
+    logo.src = `images/avatars/${skin.logo}.png`;
   }
 }
 

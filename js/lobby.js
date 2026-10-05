@@ -23,10 +23,10 @@ function buildAvatarGrid() {
     const img = document.createElement('img');
     img.alt = ch.name;
     // Try JPG (custom art), then PNG, then SVG placeholder
-    img.src = `images/avatars/${ch.id}.jpg`;
+    img.src = `images/avatars/${ch.id}.png`;
     img.onerror = () => {
       img.onerror = () => { img.onerror = null; img.src = `images/avatars/${ch.id}.svg`; };
-      img.src = `images/avatars/${ch.id}.png`;
+      img.src = `images/avatars/${ch.id}.jpg`;
     };
     const span = document.createElement('span');
     span.textContent = ch.name;
@@ -53,6 +53,7 @@ nameInput.addEventListener('input', checkReady);
 roomInput.addEventListener('input', () => {
   roomInput.value = roomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
   checkReady();
+  if (roomInput.value.length === 4) adoptHostSkin(roomInput.value);
 });
 
 function checkReady() {
@@ -66,19 +67,48 @@ const savedName   = recall('pu_name');
 const savedAvatar = recall('pu_avatar');
 if (savedName) nameInput.value = savedName;
 if (savedAvatar && getSkin().characters.some(c => c.id === savedAvatar)) selectAvatar(savedAvatar);
-const inviteCode = new URLSearchParams(location.search).get('join');
+const inviteParams = new URLSearchParams(location.search);
+const inviteCode   = inviteParams.get('join');
 if (inviteCode) roomInput.value = inviteCode.toUpperCase().slice(0, 4);
 checkReady();
 
+// The host's skin is the default for everyone who joins. The link carries it so
+// the page switches instantly; the game record is checked too (covers typed codes).
+async function adoptHostSkin(code) {
+  if (pickedSkinHere || !code || code.length !== 4) return;
+  try {
+    const snap = await db.ref(`games/${code}/skin`).get();
+    if (snap.exists() && !pickedSkinHere) useSkin(snap.val());
+  } catch (e) { /* offline or no such game: keep current skin */ }
+}
+
 // ─ Skin switch ────────────────────────────────────────────────
 // Rebuilding the grid clears the selection, since the new skin has its own cast.
+let pickedSkinHere = false;   // true once this person taps the switch themselves
+
+function useSkin(id) {
+  if (!SKINS[id] || id === getSkin().id) return;
+  setSkin(id);
+  buildAvatarGrid();
+  const saved = recall('pu_avatar');
+  if (saved && getSkin().characters.some(c => c.id === saved)) selectAvatar(saved);
+  checkReady();
+}
+
 document.getElementById('skinToggle').addEventListener('click', () => {
+  pickedSkinHere = true;
   setSkin(nextSkinId());
   buildAvatarGrid();
   const saved = recall('pu_avatar');
   if (saved && getSkin().characters.some(c => c.id === saved)) selectAvatar(saved);
   checkReady();
 });
+
+if (inviteCode) {
+  const linkSkin = inviteParams.get('skin');
+  if (linkSkin) useSkin(linkSkin);
+  adoptHostSkin(roomInput.value);
+}
 
 function genCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -98,10 +128,10 @@ function seatId() {
 
 function avatarImg(avatar) {
   const img = document.createElement('img');
-  img.src = `images/avatars/${avatar}.jpg`;
+  img.src = `images/avatars/${avatar}.png`;
   img.onerror = () => {
     img.onerror = () => { img.onerror = null; img.src = `images/avatars/${avatar}.svg`; };
-    img.src = `images/avatars/${avatar}.png`;
+    img.src = `images/avatars/${avatar}.jpg`;
   };
   return img;
 }
@@ -194,6 +224,7 @@ createBtn.addEventListener('click', async () => {
   await db.ref(`games/${code}`).set({
     state:     'waiting',
     host:      mySeat,
+    skin:      getSkin().id,
     players:   { [mySeat]: { name, avatar: selectedAvatar, joinedAt: Date.now() } },
     createdAt: Date.now()
   });
@@ -234,7 +265,7 @@ document.getElementById('startBtn').addEventListener('click', async () => {
 
 // ─ Share invite ───────────────────────────────────────────────
 document.getElementById('shareBtn').addEventListener('click', async () => {
-  const url  = `${location.origin}${location.pathname}?join=${currentCode}`;
+  const url  = `${location.origin}${location.pathname}?join=${currentCode}&skin=${getSkin().id}`;
   const text = getSkin().shareText(currentCode);
   const btn  = document.getElementById('shareBtn');
   if (navigator.share) {

@@ -112,10 +112,10 @@ function buildFaceDown() {
 function setAvatar(imgEl, avatar) {
   if (imgEl.dataset.avatar === avatar) return;   // don't reload the image every update
   imgEl.dataset.avatar = avatar;
-  imgEl.src = `images/avatars/${avatar}.jpg`;
+  imgEl.src = `images/avatars/${avatar}.png`;
   imgEl.onerror = () => {
     imgEl.onerror = () => { imgEl.onerror = null; imgEl.src = `images/avatars/${avatar}.svg`; };
-    imgEl.src = `images/avatars/${avatar}.png`;
+    imgEl.src = `images/avatars/${avatar}.jpg`;
   };
 }
 
